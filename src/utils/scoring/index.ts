@@ -16,6 +16,7 @@ import gamblers from './gamblers';
 import blackSheep from './blackSheep';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
+import participationTrophy from './participationTrophy';
 import equalAggregate from './equalAggregate';
 import weightedAggregate from './weightedAggregate';
 
@@ -27,6 +28,7 @@ export const scoringSystems: ScoringSystem[] = [
   blackSheep,
   ladder,
   hotStreak,
+  participationTrophy,
   equalAggregate,
   weightedAggregate,
 ];

@@ -23,18 +23,20 @@ import gamblers from './gamblers';
 import blackSheep from './blackSheep';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
+import participationTrophy from './participationTrophy';
 
 /** Base scoring systems to aggregate */
-const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak];
+const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak, participationTrophy];
 
 /** Short labels for per-game breakdown columns */
 const systemLabels: { key: string; label: string }[] = [
-  { key: 'tc', label: 'TC' },
-  { key: 'tp', label: 'T+' },
-  { key: 'gam', label: 'Gam' },
-  { key: 'bs', label: 'BS' },
-  { key: 'lad', label: 'Lad' },
-  { key: 'hs', label: 'HS' },
+  { key: 'tc', label: 'Ted Classic' },
+  { key: 'tp', label: 'Ted+' },
+  { key: 'gam', label: "Gambler's" },
+  { key: 'bs', label: 'Black Sheep' },
+  { key: 'lad', label: 'Ladder' },
+  { key: 'hs', label: 'Hot Streak' },
+  { key: 'pt', label: 'Participation Trophy' },
 ];
 
 /**
@@ -50,7 +52,7 @@ function normalize(scores: number[]): number[] {
 
 const equalAggregate: ScoringSystem = {
   name: 'Equal Aggregate',
-  description: 'Normalized average across all 6 scoring systems, weighted equally',
+  description: 'Normalized average across all 7 scoring systems, weighted equally',
   categoryLabels: systemLabels,
   maxPerGame: 100,
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {

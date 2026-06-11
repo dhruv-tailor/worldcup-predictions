@@ -23,9 +23,10 @@ import gamblers from './gamblers';
 import blackSheep from './blackSheep';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
+import participationTrophy from './participationTrophy';
 
 /** Base scoring systems to aggregate */
-const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak];
+const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak, participationTrophy];
 
 /**
  * Weights for each base system (same order as `baseSystems`).
@@ -39,18 +40,20 @@ const weights: number[] = [
   1.5,  // Black Sheep — rewards individual insight
   1.5,  // Ladder (ELO) — competitive pairwise ranking
   1.5,  // Hot Streak — rewards consistency
+  1.0,  // Participation Trophy — generous partial credit
 ];
 
 const totalWeight = weights.reduce((a, b) => a + b, 0);
 
-/** Short labels with weight annotations for per-game breakdown columns */
+/** Labels for per-game breakdown columns */
 const systemLabels: { key: string; label: string }[] = [
-  { key: 'tc', label: 'TC ×1' },
-  { key: 'tp', label: 'T+ ×1' },
-  { key: 'gam', label: 'Gam ×2' },
-  { key: 'bs', label: 'BS ×1.5' },
-  { key: 'lad', label: 'Lad ×1.5' },
-  { key: 'hs', label: 'HS ×1.5' },
+  { key: 'tc', label: 'Ted Classic' },
+  { key: 'tp', label: 'Ted+' },
+  { key: 'gam', label: "Gambler's" },
+  { key: 'bs', label: 'Black Sheep' },
+  { key: 'lad', label: 'Ladder' },
+  { key: 'hs', label: 'Hot Streak' },
+  { key: 'pt', label: 'Participation Trophy' },
 ];
 
 /**

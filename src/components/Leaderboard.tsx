@@ -36,16 +36,6 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
           <tr>
             <th className="rank-col">#</th>
             <th className="name-col">Player</th>
-            {playedGames.map((game) => (
-              <th
-                key={game.id}
-                className="game-col clickable"
-                onClick={() => onSelectGame(game.id)}
-                title={`${game.home} vs ${game.away}`}
-              >
-                G{game.id}
-              </th>
-            ))}
             <th className="total-col">Total</th>
             {lastGameId != null && <th className="delta-col" title="Change from last game">+/−</th>}
             {sysName === 'Ted Classic' && <th className="stat-col" title="Exact score predictions">🎯</th>}
@@ -60,8 +50,20 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
             {sysName === 'Ladder' && <th className="stat-col" title="Lowest ELO rating">Low</th>}
             {sysName === 'Hot Streak' && <th className="streak-col" title="Current streak">🔥</th>}
             {sysName === 'Hot Streak' && <th className="streak-col" title="Longest streak">Best</th>}
+            {sysName === 'Participation Trophy' && <th className="stat-col" title="Exact score predictions">🎯</th>}
+            {sysName === 'Participation Trophy' && <th className="stat-col" title="Perfect games (11 pts)">⭐</th>}
             {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <th className="stat-col" title="Best performing system">Best</th>}
             {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <th className="stat-col" title="Worst performing system">Worst</th>}
+            {playedGames.map((game) => (
+              <th
+                key={game.id}
+                className="game-col clickable"
+                onClick={() => onSelectGame(game.id)}
+                title={`${game.home} vs ${game.away}`}
+              >
+                G{game.id}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -69,20 +71,6 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
             <tr key={player.name}>
               <td className="rank-col">{index + 1}</td>
               <td className="name-col">{player.name}</td>
-              {playedGames.map((game) => {
-                const breakdown = player.gameBreakdowns.find(
-                  (gb) => gb.gameId === game.id
-                );
-                const pts = breakdown?.points.total ?? 0;
-                return (
-                  <td
-                    key={game.id}
-                    className={`game-col ${pointsClass(pts, system.maxPerGame)}`}
-                  >
-                    {breakdown ? formatDelta(pts, system) : '-'}
-                  </td>
-                );
-              })}
               <td className="total-col">{player.totalPoints}</td>
               {lastGameId != null && (() => {
                 const lastBreakdown = player.gameBreakdowns.find((gb) => gb.gameId === lastGameId);
@@ -109,8 +97,24 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
               {sysName === 'Hot Streak' && (
                 <td className="streak-col">{player.longestStreak ? `${player.longestStreak}` : '-'}</td>
               )}
+              {sysName === 'Participation Trophy' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
+              {sysName === 'Participation Trophy' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
               {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <td className="stat-col">{player.bestSystem ?? '-'}</td>}
               {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <td className="stat-col">{player.worstSystem ?? '-'}</td>}
+              {playedGames.map((game) => {
+                const breakdown = player.gameBreakdowns.find(
+                  (gb) => gb.gameId === game.id
+                );
+                const pts = breakdown?.points.total ?? 0;
+                return (
+                  <td
+                    key={game.id}
+                    className={`game-col ${pointsClass(pts, system.maxPerGame)}`}
+                  >
+                    {breakdown ? formatDelta(pts, system) : '-'}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

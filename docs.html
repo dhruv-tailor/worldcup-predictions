@@ -208,7 +208,7 @@
     <!-- ============================================================ -->
     <h2 id="scoring-systems">Scoring Systems</h2>
     <p>
-      The app ships with six scoring systems. Each takes the same input — a list
+      The app ships with seven base scoring systems plus two aggregate (meta) systems. Each takes the same input — a list
       of games and predictions — and produces a leaderboard. Switch between them
       using the dropdown at the top of the app.
     </p>
@@ -357,17 +357,46 @@
       </div>
     </div>
 
+    <!-- Participation Trophy -->
+    <div class="scoring-card">
+      <h3>Participation Trophy <span class="badge badge-simple">Simple</span> <span class="max-pts">Max 11 pts/game</span></h3>
+      <p>
+        The most generous scoring system — awards points across 7 independent categories,
+        giving credit for every partial match. No negative points.
+      </p>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Winner</td><td>+2</td><td>Correctly predicted home win, away win, or draw</td></tr>
+          <tr><td>Home Goals</td><td>+1</td><td>Predicted exact home team score</td></tr>
+          <tr><td>Away Goals</td><td>+1</td><td>Predicted exact away team score</td></tr>
+          <tr><td>Goal Difference</td><td>+1</td><td>Predicted goal difference (home − away) matches actual</td></tr>
+          <tr><td>Total Goals</td><td>+1</td><td>Predicted total goals (home + away) matches actual</td></tr>
+          <tr><td>Within One</td><td>+1</td><td>Both predicted scores are within ±1 of actual</td></tr>
+          <tr><td>Exact Score</td><td>+4</td><td>Both home and away scores match exactly (jackpot)</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example:</strong> Actual: Mexico 2–0 South Africa. You predicted 2–0.
+        → Winner ✓ (+2), Home ✓ (+1), Away ✓ (+1), GD ✓ (+1), Total ✓ (+1), Close ✓ (+1), Exact ✓ (+4) = <strong>11 points</strong>
+      </div>
+      <div class="example">
+        <strong>Partial example:</strong> Actual: 3–1. You predicted 2–0.
+        → Winner ✓ (+2), Home ✗, Away ✗, GD ✓ (+1), Total ✗, Close ✓ (+1), Exact ✗ = <strong>4 points</strong>
+      </div>
+    </div>
+
     <!-- Equal Aggregate -->
     <div class="scoring-card">
       <h3>Equal Aggregate <span class="badge badge-context">Meta</span> <span class="max-pts">Max 100 pts/game</span></h3>
       <p>
-        A "consensus" ranking that combines all 6 base scoring systems equally.
+        A "consensus" ranking that combines all 7 base scoring systems equally.
         Each system's raw scores are normalized to a 0–100 scale per game using
         min-max normalization, then averaged.
       </p>
       <div class="formula">
         <code>normalized = (score − min) / (max − min) × 100</code><br>
-        <code>total = average of all 6 normalized scores</code>
+        <code>total = average of all 7 normalized scores</code>
       </div>
       <table>
         <thead><tr><th>Column</th><th>Value</th><th>Meaning</th></tr></thead>
@@ -378,6 +407,7 @@
           <tr><td>BS</td><td>0–100</td><td>Normalized Black Sheep score</td></tr>
           <tr><td>Lad</td><td>0–100</td><td>Normalized Ladder (ELO) delta</td></tr>
           <tr><td>HS</td><td>0–100</td><td>Normalized Hot Streak score</td></tr>
+          <tr><td>PT</td><td>0–100</td><td>Normalized Participation Trophy score</td></tr>
         </tbody>
       </table>
       <div class="example">
@@ -405,6 +435,7 @@
           <tr><td>Black Sheep</td><td>×1.5</td><td>Rewards individual insight over groupthink</td></tr>
           <tr><td>Ladder (ELO)</td><td>×1.5</td><td>Competitive head-to-head ranking</td></tr>
           <tr><td>Hot Streak</td><td>×1.5</td><td>Rewards consistency over time</td></tr>
+          <tr><td>Participation Trophy</td><td>×1.0</td><td>Generous partial-credit baseline</td></tr>
         </tbody>
       </table>
       <div class="example">
@@ -421,7 +452,7 @@
         <tr>
           <td><span class="badge badge-simple">Simple</span></td>
           <td>Stateless per-game scoring — each prediction is scored independently</td>
-          <td>Ted Classic, Ted+</td>
+          <td>Ted Classic, Ted+, Participation Trophy</td>
         </tr>
         <tr>
           <td><span class="badge badge-context">Context-Aware</span></td>
@@ -454,6 +485,7 @@
 │
 ├── <span class="folder">components/</span>
 │   ├── <span class="file">Leaderboard.tsx</span>  <span class="desc">— Ranked standings table with per-game columns</span>
+│   ├── <span class="file">CategoryBreakdown.tsx</span> <span class="desc">— All system leaderboards grid with PNG export</span>
 │   ├── <span class="file">GameCard.tsx</span>     <span class="desc">— Detailed view for a single game's predictions</span>
 │   ├── <span class="file">ScoreChart.tsx</span>   <span class="desc">— Line chart: cumulative scores over time (recharts)</span>
 │   └── <span class="file">ScoringSelector.tsx</span> <span class="desc">— Dropdown to switch scoring systems</span>
@@ -473,6 +505,7 @@
         ├── <span class="file">blackSheep.ts</span> <span class="desc">— Black Sheep scoring system</span>
         ├── <span class="file">ladder.ts</span>    <span class="desc">— Ladder (ELO) scoring system</span>
         ├── <span class="file">hotStreak.ts</span> <span class="desc">— Hot Streak scoring system</span>
+        ├── <span class="file">participationTrophy.ts</span> <span class="desc">— Participation Trophy scoring system</span>
         ├── <span class="file">equalAggregate.ts</span> <span class="desc">— Equal Aggregate (meta) scoring system</span>
         └── <span class="file">weightedAggregate.ts</span> <span class="desc">— Weighted Aggregate (meta) scoring system</span></code></pre>
 
@@ -486,6 +519,7 @@ Game[] + Prediction[]
 PlayerScore[] (sorted leaderboard)
     │
     ├──▶ Leaderboard.tsx  — ranked table
+    ├──▶ CategoryBreakdown.tsx — all system leaderboards
     ├──▶ ScoreChart.tsx   — line chart over time
     └──▶ GameCard.tsx     — single game detail view</code></pre>
 
@@ -531,7 +565,7 @@ interface ScoringSystem {
         <tr>
           <td><strong>Simple</strong> — stateless per-game</td>
           <td><code>simpleScoring(fn)</code> wraps a <code>(game, prediction) =&gt; PointBreakdown</code> function</td>
-          <td>Ted Classic, Ted+</td>
+          <td>Ted Classic, Ted+, Participation Trophy</td>
         </tr>
         <tr>
           <td><strong>Context-aware</strong> — needs all predictions per game</td>
@@ -714,6 +748,7 @@ npm run preview      # Preview production build</code></pre>
         <tr><td>Vite</td><td>Build tool and dev server (HMR)</td></tr>
         <tr><td>PapaParse</td><td>CSV parsing</td></tr>
         <tr><td>Recharts</td><td>Line chart visualization</td></tr>
+        <tr><td>html-to-image</td><td>PNG export of leaderboard grids</td></tr>
       </tbody>
     </table>
 

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { parseGames, parsePredictions } from './utils/parseData'
 import { scoringSystems } from './utils/scoring'
 import Leaderboard from './components/Leaderboard'
+import CategoryBreakdown from './components/CategoryBreakdown'
 import GameCard from './components/GameCard'
 import ScoringSelector from './components/ScoringSelector'
 import ScoreChart from './components/ScoreChart'
@@ -62,16 +63,20 @@ function App() {
         />
       ) : (
         <>
-          <ScoreChart
-            standings={standings}
-            games={games}
-            system={selectedSystem}
-          />
           <Leaderboard
             standings={standings}
             games={games}
             system={selectedSystem}
             onSelectGame={setSelectedGameId}
+          />
+          <CategoryBreakdown
+            games={games}
+            predictions={predictions}
+          />
+          <ScoreChart
+            standings={standings}
+            games={games}
+            system={selectedSystem}
           />
         </>
       )}
