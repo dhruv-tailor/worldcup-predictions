@@ -56,7 +56,7 @@ const gamblers: ScoringSystem = {
       }
 
       const gamePredictions = predictions.filter((p) => p.gameId === game.id);
-      const totalPlayers = playerNames.length;
+      const totalPlayers = gamePredictions.length;
       const actualWinner = getWinner(game.homeScore, game.awayScore);
 
       // Count how many players predicted each outcome (home win, away win, draw)

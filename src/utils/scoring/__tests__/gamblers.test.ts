@@ -60,7 +60,7 @@ describe("Gambler's", () => {
     expect(standings[0].totalPoints).toBe(0);
   });
 
-  it('uses total player count (not just those who predicted this game) for multiplier', () => {
+  it('uses per-game prediction count for multiplier', () => {
     const games: Game[] = [
       { id: 1, home: 'A', away: 'B', homeScore: 2, awayScore: 1 },
       { id: 2, home: 'C', away: 'D', homeScore: 1, awayScore: 0 },
@@ -75,10 +75,10 @@ describe("Gambler's", () => {
 
     const alice = standings.find((s) => s.name === 'Alice')!;
     const g1 = alice.gameBreakdowns.find((b) => b.gameId === 1)!;
-    // totalPlayers = 3 (all players), sameOutcome = 1 (only Alice), multiplier = 3/1 = 3
+    // totalPlayers = 2 (only Alice and Bob predicted game 1), sameOutcome = 1, multiplier = 2/1 = 2
     expect(g1.points.categories.base).toBe(1);
-    expect(g1.points.categories.uniqueBonus).toBe(2);
-    expect(g1.points.total).toBe(3);
+    expect(g1.points.categories.uniqueBonus).toBe(1);
+    expect(g1.points.total).toBe(2);
   });
 
   it('handles unplayed game', () => {
