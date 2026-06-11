@@ -77,6 +77,14 @@ const hotStreak: ScoringSystem = {
           points: { categories: { base, streakBonus }, total: base + streakBonus },
         });
       }
+
+      // Reset streak for players who didn't submit a prediction for this game
+      for (const name of playerNames) {
+        const hasPrediction = gamePredictions.some((p) => p.name === name);
+        if (!hasPrediction) {
+          streaks.set(name, 0);
+        }
+      }
     }
 
     const standings: PlayerScore[] = [];

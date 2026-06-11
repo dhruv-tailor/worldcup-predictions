@@ -109,6 +109,15 @@ const equalAggregate: ScoringSystem = {
             prediction,
             points: { categories, total },
           });
+        } else {
+          // Player has no prediction for this game — record zero-point breakdown
+          const zeroCategories: Record<string, number> = {};
+          for (const lbl of systemLabels) zeroCategories[lbl.key] = 0;
+          playerBreakdowns.get(name)!.push({
+            gameId: game.id,
+            prediction: { name, gameId: game.id, homeScore: 0, awayScore: 0 },
+            points: { categories: zeroCategories, total: 0 },
+          });
         }
       }
     }

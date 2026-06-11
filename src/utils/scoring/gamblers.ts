@@ -31,6 +31,7 @@ const gamblers: ScoringSystem = {
   ],
   maxPerGame: 15,
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
+    const playerNames = [...new Set(predictions.map((p) => p.name))];
     const playerMap = new Map<string, GameBreakdown[]>();
 
     for (const prediction of predictions) {
@@ -55,7 +56,7 @@ const gamblers: ScoringSystem = {
       }
 
       const gamePredictions = predictions.filter((p) => p.gameId === game.id);
-      const totalPlayers = gamePredictions.length;
+      const totalPlayers = playerNames.length;
       const actualWinner = getWinner(game.homeScore, game.awayScore);
 
       // Count how many players predicted each outcome (home win, away win, draw)
