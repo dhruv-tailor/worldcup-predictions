@@ -26,6 +26,7 @@ interface LeaderboardProps {
  */
 export default function Leaderboard({ standings, games, system, onSelectGame }: LeaderboardProps) {
   const playedGames = games.filter((g) => g.homeScore !== null).sort((a, b) => a.id - b.id);
+  const isHotStreak = system.name === 'Hot Streak';
 
   return (
     <div className="leaderboard">
@@ -45,6 +46,8 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
               </th>
             ))}
             <th className="total-col">Total</th>
+            {isHotStreak && <th className="streak-col" title="Current streak">🔥</th>}
+            {isHotStreak && <th className="streak-col" title="Longest streak">Best</th>}
           </tr>
         </thead>
         <tbody>
@@ -67,6 +70,12 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
                 );
               })}
               <td className="total-col">{player.totalPoints}</td>
+              {isHotStreak && (
+                <td className="streak-col">{player.currentStreak ? `${player.currentStreak}` : '-'}</td>
+              )}
+              {isHotStreak && (
+                <td className="streak-col">{player.longestStreak ? `${player.longestStreak}` : '-'}</td>
+              )}
             </tr>
           ))}
         </tbody>

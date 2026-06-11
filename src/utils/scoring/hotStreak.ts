@@ -33,10 +33,12 @@ const hotStreak: ScoringSystem = {
     const playerNames = [...new Set(predictions.map((p) => p.name))];
     const playerBreakdowns = new Map<string, GameBreakdown[]>();
     const streaks = new Map<string, number>();
+    const maxStreaks = new Map<string, number>();
 
     for (const name of playerNames) {
       playerBreakdowns.set(name, []);
       streaks.set(name, 0);
+      maxStreaks.set(name, 0);
     }
 
     const sortedGames = [...games].sort((a, b) => a.id - b.id);
@@ -66,7 +68,10 @@ const hotStreak: ScoringSystem = {
         if (correctWinner) {
           const currentStreak = streaks.get(prediction.name)!;
           streakBonus = currentStreak; // 0 for first correct, +1 for second, etc.
-          streaks.set(prediction.name, currentStreak + 1);
+          const newStreak = currentStreak + 1;
+          streaks.set(prediction.name, newStreak);
+          const best = maxStreaks.get(prediction.name)!;
+          if (newStreak > best) maxStreaks.set(prediction.name, newStreak);
         } else {
           streaks.set(prediction.name, 0);
         }
@@ -90,7 +95,9 @@ const hotStreak: ScoringSystem = {
     const standings: PlayerScore[] = [];
     for (const [name, breakdowns] of playerBreakdowns) {
       const totalPoints = breakdowns.reduce((sum, gb) => sum + gb.points.total, 0);
-      standings.push({ name, totalPoints, gameBreakdowns: breakdowns });
+      const currentStreak = streaks.get(name) ?? 0;
+      const longestStreak = maxStreaks.get(name) ?? 0;
+      standings.push({ name, totalPoints, gameBreakdowns: breakdowns, currentStreak, longestStreak });
     }
     standings.sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
     return standings;

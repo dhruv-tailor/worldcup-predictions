@@ -63,6 +63,10 @@ export interface PlayerScore {
   totalPoints: number;
   /** Per-game point breakdowns, ordered by game ID */
   gameBreakdowns: GameBreakdown[];
+  /** Current consecutive correct-winner streak (Hot Streak only) */
+  currentStreak?: number;
+  /** Longest consecutive correct-winner streak achieved (Hot Streak only) */
+  longestStreak?: number;
 }
 
 /**
