@@ -31,7 +31,6 @@ const gamblers: ScoringSystem = {
   ],
   maxPerGame: 15,
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
-    const playerNames = [...new Set(predictions.map((p) => p.name))];
     const playerMap = new Map<string, GameBreakdown[]>();
 
     for (const prediction of predictions) {
