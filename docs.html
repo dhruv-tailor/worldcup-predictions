@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Cup Predictions — Documentation</title>
+  <style>
+    :root {
+      --bg: #111827;
+      --bg-alt: #1f2937;
+      --text: #9ca3af;
+      --text-h: #f3f4f6;
+      --border: #374151;
+      --accent: #a78bfa;
+      --accent-bg: rgba(167, 139, 250, 0.12);
+      --code-bg: #1f2937;
+      --green: #4ade80;
+      --blue: #60a5fa;
+      --orange: #fb923c;
+      --red: #f87171;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: var(--text-h);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    h1 span { font-size: 2.4rem; }
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-bottom: 40px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: var(--text-h);
+      margin: 48px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    h3 {
+      font-size: 1.15rem;
+      color: var(--text-h);
+      margin: 28px 0 10px;
+    }
+    p { margin-bottom: 14px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      background: var(--code-bg);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: var(--text-h);
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      margin: 14px 0 20px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 0.92rem;
+    }
+    th, td {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    th {
+      background: var(--bg-alt);
+      color: var(--text-h);
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+    .badge-simple { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+    .badge-context { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+    .badge-stateful { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+    .scoring-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      background: var(--bg);
+    }
+    .scoring-card h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .formula {
+      background: var(--accent-bg);
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 10px 0 14px;
+      font-size: 0.92rem;
+    }
+    .example {
+      background: var(--bg-alt);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 10px 0 6px;
+      font-size: 0.9rem;
+    }
+    .example strong { color: var(--text-h); }
+    .tree {
+      font-family: 'Cascadia Code', Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .tree .folder { color: var(--blue); font-weight: 600; }
+    .tree .file { color: var(--text); }
+    .tree .desc { color: var(--text); opacity: 0.7; font-style: italic; }
+    nav {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      z-index: 100;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    nav a { font-weight: 500; }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    ol.steps { list-style: none; padding: 0; }
+    ol.steps li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    ol.steps li > div { flex: 1; }
+    .max-pts {
+      float: right;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#scoring-systems">Scoring Systems</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#data-format">Data Format</a>
+    <a href="#how-to">How-To Guides</a>
+    <a href="#development">Development</a>
+  </nav>
+
+  <div class="container">
+    <h1><span>⚽</span> World Cup Predictions</h1>
+    <p class="subtitle">
+      A React + Vite app that calculates and compares World Cup prediction scores
+      across multiple scoring systems. Track your friends' predictions, see who's
+      on top, and visualize performance over time.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 id="scoring-systems">Scoring Systems</h2>
+    <p>
+      The app ships with six scoring systems. Each takes the same input — a list
+      of games and predictions — and produces a leaderboard. Switch between them
+      using the dropdown at the top of the app.
+    </p>
+
+    <!-- Ted Classic -->
+    <div class="scoring-card">
+      <h3>Ted Classic <span class="badge badge-simple">Simple</span> <span class="max-pts">Max 4 pts/game</span></h3>
+      <p>The original scoring system. Rewards predicting the correct outcome, goal difference, and exact score.</p>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Winner</td><td>+2</td><td>Correctly predicted home win, away win, or draw</td></tr>
+          <tr><td>Goal Difference</td><td>+1</td><td>Predicted goal difference (home − away) matches actual</td></tr>
+          <tr><td>Exact Score</td><td>+1</td><td>Both home and away scores match exactly</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example:</strong> Actual: Mexico 2–1 South Africa. You predicted 2–1.
+        → Winner ✓ (+2), GD ✓ (+1), Exact ✓ (+1) = <strong>4 points</strong>
+      </div>
+    </div>
+
+    <!-- Ted+ -->
+    <div class="scoring-card">
+      <h3>Ted+ <span class="badge badge-simple">Simple</span> <span class="max-pts">Max 7 pts/game</span></h3>
+      <p>Enhanced version of Ted Classic with additional categories and higher rewards for harder predictions.</p>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Winner</td><td>+2 / +3</td><td>+2 for correct home/away win, <strong>+3 for correctly predicting a draw</strong> (draws are harder)</td></tr>
+          <tr><td>Goal Difference</td><td>+1</td><td>Predicted goal difference matches actual</td></tr>
+          <tr><td>Total Goals</td><td>+1</td><td>Predicted total goals (home + away) matches actual</td></tr>
+          <tr><td>Exact Score</td><td>+2</td><td>Both scores match exactly (worth double vs. Ted Classic)</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example:</strong> Actual: 1–1 draw. You predicted 1–1.
+        → Draw ✓ (+3), GD ✓ (+1), Total goals ✓ (+1), Exact ✓ (+2) = <strong>7 points</strong>
+      </div>
+    </div>
+
+    <!-- Gambler's -->
+    <div class="scoring-card">
+      <h3>Gambler's <span class="badge badge-context">Context-Aware</span> <span class="max-pts">Variable pts</span></h3>
+      <p>
+        Rewards going against the grain. The fewer people who predicted the same outcome as you,
+        the bigger your payoff when you're right. Wrong winner = 0 points.
+      </p>
+      <div class="formula">
+        <code>multiplier = totalPlayers / playersWhoPickedSameOutcome</code><br>
+        <code>base = 1 (correct winner) + 2 (if exact score)</code><br>
+        <code>total = round(base × multiplier)</code>
+      </div>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Base</td><td>1–3</td><td>+1 for correct winner, +2 bonus for exact score</td></tr>
+          <tr><td>Uniqueness Bonus</td><td>varies</td><td>round(base × multiplier) − base</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example:</strong> 11 players, only 2 predicted a draw, draw happens.
+        multiplier = 11 / 2 = 5.5 → total = round(1 × 5.5) = <strong>6 points</strong>.
+        If 9 out of 11 predicted home win and home wins: multiplier = 11 / 9 ≈ 1.2 → total = <strong>1 point</strong>.
+      </div>
+    </div>
+
+    <!-- Ladder -->
+    <div class="scoring-card">
+      <h3>Ladder (ELO) <span class="badge badge-stateful">Stateful</span></h3>
+      <p>
+        Competitive ranking using the ELO rating system from chess. Everyone starts at <strong>1000</strong>.
+        Each game, every pair of players is compared head-to-head — the better prediction wins the matchup.
+      </p>
+      <div class="formula">
+        <code>Expected: E<sub>A</sub> = 1 / (1 + 10<sup>(R<sub>B</sub> − R<sub>A</sub>) / 400</sup>)</code><br>
+        <code>Rating change: Δ = k × (S − E)</code>, where <code>k = 32 / (numPlayers − 1)</code><br>
+        "Better prediction" is determined by Ted Classic raw score (0–4).
+      </div>
+      <table>
+        <thead><tr><th>Category</th><th>Value</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Δ (Delta)</td><td>+/− number</td><td>Rating change for that game</td></tr>
+          <tr><td>Total</td><td>ELO rating</td><td>Current rating (NOT a cumulative point sum)</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Key insight:</strong> Beating a higher-rated player earns more ELO.
+        Losing to a lower-rated player costs more. Equal predictions = draw (Δ ≈ 0).
+      </div>
+    </div>
+
+    <!-- Hot Streak -->
+    <div class="scoring-card">
+      <h3>Hot Streak <span class="badge badge-stateful">Stateful</span> <span class="max-pts">Max ~8 pts/game</span></h3>
+      <p>
+        Ted Classic base scoring plus escalating bonuses for consecutive correct winner predictions.
+        Wrong winner resets the streak to zero.
+      </p>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Base</td><td>0–4</td><td>Identical to Ted Classic scoring</td></tr>
+          <tr><td>Streak Bonus</td><td>0, +1, +2, +3…</td><td>+(n−1) for the nth consecutive correct winner</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example streak:</strong>
+        Game 1: correct winner → streak = 1, bonus = +0 |
+        Game 2: correct winner → streak = 2, bonus = +1 |
+        Game 3: correct winner → streak = 3, bonus = +2 |
+        Game 4: wrong winner → streak resets to 0
+      </div>
+    </div>
+
+    <!-- Equal Aggregate -->
+    <div class="scoring-card">
+      <h3>Equal Aggregate <span class="badge badge-context">Meta</span> <span class="max-pts">Max 100 pts/game</span></h3>
+      <p>
+        A "consensus" ranking that combines all 5 base scoring systems equally.
+        Each system's raw scores are normalized to a 0–100 scale per game using
+        min-max normalization, then averaged.
+      </p>
+      <div class="formula">
+        <code>normalized = (score − min) / (max − min) × 100</code><br>
+        <code>total = average of all 5 normalized scores</code>
+      </div>
+      <table>
+        <thead><tr><th>Column</th><th>Value</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>TC</td><td>0–100</td><td>Normalized Ted Classic score</td></tr>
+          <tr><td>T+</td><td>0–100</td><td>Normalized Ted+ score</td></tr>
+          <tr><td>Gam</td><td>0–100</td><td>Normalized Gambler's score</td></tr>
+          <tr><td>Lad</td><td>0–100</td><td>Normalized Ladder (ELO) delta</td></tr>
+          <tr><td>HS</td><td>0–100</td><td>Normalized Hot Streak score</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Key insight:</strong> A player must perform well across <em>all</em> scoring philosophies
+        to rank highly. Dominating one system but failing at others won't save you.
+      </div>
+    </div>
+
+    <!-- Weighted Aggregate -->
+    <div class="scoring-card">
+      <h3>Weighted Aggregate <span class="badge badge-context">Meta</span> <span class="max-pts">Max 100 pts/game</span></h3>
+      <p>
+        Same normalized approach as Equal Aggregate, but each system is scaled by a
+        configurable weight before averaging. Emphasizes bolder and more competitive systems.
+      </p>
+      <div class="formula">
+        <code>total = Σ(normalized<sub>i</sub> × weight<sub>i</sub>) / Σ(weight<sub>i</sub>)</code>
+      </div>
+      <table>
+        <thead><tr><th>System</th><th>Weight</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>Ted Classic</td><td>×1.0</td><td>Baseline scoring</td></tr>
+          <tr><td>Ted+</td><td>×1.0</td><td>Enhanced baseline</td></tr>
+          <tr><td>Gambler's</td><td>×2.0</td><td>Rewards bold, contrarian predictions</td></tr>
+          <tr><td>Ladder (ELO)</td><td>×1.5</td><td>Competitive head-to-head ranking</td></tr>
+          <tr><td>Hot Streak</td><td>×1.5</td><td>Rewards consistency over time</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Customization:</strong> Edit the <code>weights</code> array in
+        <code>src/utils/scoring/weightedAggregate.ts</code> to change the emphasis.
+        The total weight sum is calculated automatically.
+      </div>
+    </div>
+
+    <h3>System Type Badges</h3>
+    <table>
+      <thead><tr><th>Badge</th><th>Meaning</th><th>Systems</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-simple">Simple</span></td>
+          <td>Stateless per-game scoring — each prediction is scored independently</td>
+          <td>Ted Classic, Ted+</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-context">Context-Aware</span></td>
+          <td>Needs all predictions for a game to calculate (e.g., uniqueness multiplier)</td>
+          <td>Gambler's</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-stateful">Stateful</span></td>
+          <td>Maintains cumulative state across sequential games (ELO, streaks)</td>
+          <td>Ladder, Hot Streak</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-context">Meta</span></td>
+          <td>Aggregates results from all base scoring systems into a unified ranking</td>
+          <td>Equal Aggregate, Weighted Aggregate</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="architecture">Architecture</h2>
+
+    <h3>Project Structure</h3>
+    <pre class="tree"><code><span class="folder">src/</span>
+├── <span class="file">App.tsx</span>              <span class="desc">— Root component: state management, view routing</span>
+├── <span class="file">App.css</span>              <span class="desc">— All component styles</span>
+├── <span class="file">types.ts</span>             <span class="desc">— TypeScript interfaces (Game, Prediction, ScoringSystem, etc.)</span>
+├── <span class="file">main.tsx</span>             <span class="desc">— React entry point</span>
+├── <span class="file">index.css</span>            <span class="desc">— Global styles and CSS variables</span>
+│
+├── <span class="folder">components/</span>
+│   ├── <span class="file">Leaderboard.tsx</span>  <span class="desc">— Ranked standings table with per-game columns</span>
+│   ├── <span class="file">GameCard.tsx</span>     <span class="desc">— Detailed view for a single game's predictions</span>
+│   ├── <span class="file">ScoreChart.tsx</span>   <span class="desc">— Line chart: cumulative scores over time (recharts)</span>
+│   └── <span class="file">ScoringSelector.tsx</span> <span class="desc">— Dropdown to switch scoring systems</span>
+│
+├── <span class="folder">data/</span>
+│   ├── <span class="file">games.csv</span>        <span class="desc">— Game schedule and results (semicolon-delimited)</span>
+│   └── <span class="file">predictions.csv</span>  <span class="desc">— Player predictions (semicolon-delimited)</span>
+│
+└── <span class="folder">utils/</span>
+    ├── <span class="file">parseData.ts</span>     <span class="desc">— CSV parsing (papaparse)</span>
+    └── <span class="folder">scoring/</span>
+        ├── <span class="file">index.ts</span>     <span class="desc">— Barrel export: scoringSystems array</span>
+        ├── <span class="file">helpers.ts</span>   <span class="desc">— Shared: getWinner(), simpleScoring(), tedClassicRawScore()</span>
+        ├── <span class="file">tedClassic.ts</span><span class="desc">— Ted Classic scoring system</span>
+        ├── <span class="file">tedPlus.ts</span>   <span class="desc">— Ted+ scoring system</span>
+        ├── <span class="file">gamblers.ts</span>  <span class="desc">— Gambler's Mode scoring system</span>
+        ├── <span class="file">ladder.ts</span>    <span class="desc">— Ladder (ELO) scoring system</span>
+        ├── <span class="file">hotStreak.ts</span> <span class="desc">— Hot Streak scoring system</span>
+        ├── <span class="file">equalAggregate.ts</span> <span class="desc">— Equal Aggregate (meta) scoring system</span>
+        └── <span class="file">weightedAggregate.ts</span> <span class="desc">— Weighted Aggregate (meta) scoring system</span></code></pre>
+
+    <h3>Data Flow</h3>
+    <pre><code>CSV files (games.csv, predictions.csv)
+    │
+    ▼  parseData.ts (papaparse)
+Game[] + Prediction[]
+    │
+    ▼  selectedSystem.calculateStandings(games, predictions)
+PlayerScore[] (sorted leaderboard)
+    │
+    ├──▶ Leaderboard.tsx  — ranked table
+    ├──▶ ScoreChart.tsx   — line chart over time
+    └──▶ GameCard.tsx     — single game detail view</code></pre>
+
+    <h3>Key Types</h3>
+    <pre><code>// A game (played or unplayed)
+interface Game {
+  id: number;           // Sequential — games are played in ID order
+  home: string;         // Home team name
+  away: string;         // Away team name
+  homeScore: number | null;  // null = not yet played
+  awayScore: number | null;
+}
+
+// A player's prediction for one game
+interface Prediction {
+  name: string;         // Player name
+  gameId: number;       // References Game.id
+  homeScore: number;
+  awayScore: number;
+}
+
+// Points earned — flexible categories per scoring system
+interface PointBreakdown {
+  categories: Record&lt;string, number&gt;;  // e.g. { winner: 2, goalDifference: 1 }
+  total: number;
+}
+
+// A scoring system definition
+interface ScoringSystem {
+  name: string;
+  description: string;
+  categoryLabels: { key: string; label: string }[];  // drives UI columns
+  maxPerGame?: number;   // for color-scaling in the UI
+  calculateStandings: (games: Game[], predictions: Prediction[]) =&gt; PlayerScore[];
+}</code></pre>
+
+    <h3>How Scoring Systems Work Internally</h3>
+    <p>Each scoring system is an object that conforms to the <code>ScoringSystem</code> interface. The key method is <code>calculateStandings</code>, which receives all games and predictions and returns sorted player standings.</p>
+    <p>There are three patterns:</p>
+    <table>
+      <thead><tr><th>Pattern</th><th>Helper</th><th>Used By</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Simple</strong> — stateless per-game</td>
+          <td><code>simpleScoring(fn)</code> wraps a <code>(game, prediction) =&gt; PointBreakdown</code> function</td>
+          <td>Ted Classic, Ted+</td>
+        </tr>
+        <tr>
+          <td><strong>Context-aware</strong> — needs all predictions per game</td>
+          <td>Custom <code>calculateStandings</code> method</td>
+          <td>Gambler's</td>
+        </tr>
+        <tr>
+          <td><strong>Stateful</strong> — cumulative state across games</td>
+          <td>Custom <code>calculateStandings</code> method with state maps</td>
+          <td>Ladder, Hot Streak</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="data-format">Data Format</h2>
+
+    <h3>games.csv</h3>
+    <p>Semicolon-delimited. One row per game. Empty score fields mean the game hasn't been played yet.</p>
+    <pre><code>id;home;away;home_score;away_score
+1;Mexico;South Africa;;
+2;South Korea;Czechia;;
+3;Germany;Japan;2;1</code></pre>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Sequential game number — games are played in this order</td></tr>
+        <tr><td><code>home</code></td><td>string</td><td>Home team name</td></tr>
+        <tr><td><code>away</code></td><td>string</td><td>Away team name</td></tr>
+        <tr><td><code>home_score</code></td><td>integer or empty</td><td>Home team's final score. Leave empty for unplayed games.</td></tr>
+        <tr><td><code>away_score</code></td><td>integer or empty</td><td>Away team's final score. Leave empty for unplayed games.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>predictions.csv</h3>
+    <p>Semicolon-delimited. One row per player per game.</p>
+    <pre><code>name;game_id;home_score;away_score
+Raf;1;1;0
+Raf;2;1;2
+Didi;1;3;0</code></pre>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>Player's display name</td></tr>
+        <tr><td><code>game_id</code></td><td>integer</td><td>References a game <code>id</code> from games.csv</td></tr>
+        <tr><td><code>home_score</code></td><td>integer</td><td>Predicted home team score</td></tr>
+        <tr><td><code>away_score</code></td><td>integer</td><td>Predicted away team score</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="how-to">How-To Guides</h2>
+
+    <h3>Add a New Game</h3>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div>Open <code>src/data/games.csv</code> and add a new row with the next sequential ID, team names, and empty scores:
+          <pre><code>3;Germany;Japan;;</code></pre>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div>Add each player's prediction for the new game in <code>src/data/predictions.csv</code>:
+          <pre><code>Raf;3;2;0
+Didi;3;1;1</code></pre>
+        </div>
+      </li>
+    </ol>
+
+    <h3>Record a Game Result</h3>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div>Open <code>src/data/games.csv</code> and fill in the <code>home_score</code> and <code>away_score</code> for the game:
+          <pre><code>3;Germany;Japan;2;1</code></pre>
+          The leaderboard, chart, and all scoring systems will update automatically on save (via Vite HMR).
+        </div>
+      </li>
+    </ol>
+
+    <h3>Add a New Player</h3>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div>Add prediction rows for the new player in <code>src/data/predictions.csv</code>. Use the same <code>name</code> value across all their predictions:
+          <pre><code>NewPlayer;1;2;0
+NewPlayer;2;1;1</code></pre>
+          The player will appear in the leaderboard automatically.
+        </div>
+      </li>
+    </ol>
+
+    <h3>Add a New Scoring System</h3>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div>Create a new file in <code>src/utils/scoring/</code>, e.g., <code>mySystem.ts</code>.</div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div>Define your system as a <code>ScoringSystem</code> object with a default export:
+<pre><code>import type { ScoringSystem } from '../../types';
+import { simpleScoring } from './helpers';  // if stateless
+
+const mySystem: ScoringSystem = {
+  name: 'My System',
+  description: 'Short description of the rules',
+  categoryLabels: [
+    { key: 'myCategory', label: 'My Cat' },
+  ],
+  maxPerGame: 5,  // for UI color scaling
+
+  // Option A: Simple (stateless per-game)
+  calculateStandings: simpleScoring((game, prediction) =&gt; {
+    // Return { categories: { myCategory: points }, total: points }
+  }),
+
+  // Option B: Custom (context-aware or stateful)
+  // calculateStandings(games, predictions) { ... }
+};
+
+export default mySystem;</code></pre>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div>Register it in <code>src/utils/scoring/index.ts</code>:
+<pre><code>import mySystem from './mySystem';
+
+export const scoringSystems: ScoringSystem[] = [
+  tedClassic,
+  tedPlus,
+  // ...
+  mySystem,  // ← add here
+];</code></pre>
+          The new system will appear in the dropdown automatically.
+        </div>
+      </li>
+    </ol>
+
+    <h3>Available Helpers</h3>
+    <p>When building a new scoring system, these shared utilities from <code>helpers.ts</code> are available:</p>
+    <table>
+      <thead><tr><th>Function</th><th>Returns</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>getWinner(homeScore, awayScore)</code></td>
+          <td><code>'home' | 'away' | 'draw'</code></td>
+          <td>Determines the match outcome</td>
+        </tr>
+        <tr>
+          <td><code>simpleScoring(scoreFn)</code></td>
+          <td><code>calculateStandings</code></td>
+          <td>Wraps a per-game function into a full standings pipeline (handles grouping, sorting)</td>
+        </tr>
+        <tr>
+          <td><code>tedClassicRawScore(game, prediction)</code></td>
+          <td><code>number (0–4)</code></td>
+          <td>Ted Classic score — useful as a base measure in composite systems</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 id="development">Development</h2>
+
+    <h3>Quick Start</h3>
+    <pre><code>npm install          # Install dependencies
+npm run dev          # Start dev server (http://localhost:5173)
+npm run build        # Production build
+npm run preview      # Preview production build</code></pre>
+
+    <h3>Tech Stack</h3>
+    <table>
+      <thead><tr><th>Technology</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>React 19</td><td>UI framework</td></tr>
+        <tr><td>TypeScript</td><td>Type safety</td></tr>
+        <tr><td>Vite</td><td>Build tool and dev server (HMR)</td></tr>
+        <tr><td>PapaParse</td><td>CSV parsing</td></tr>
+        <tr><td>Recharts</td><td>Line chart visualization</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Type Checking</h3>
+    <pre><code>npx tsc --noEmit     # Verify TypeScript compiles without errors</code></pre>
+
+    <h3>Key Design Decisions</h3>
+    <ul style="margin-left: 20px; margin-bottom: 14px;">
+      <li><code>PointBreakdown.categories</code> uses <code>Record&lt;string, number&gt;</code> — each system defines its own keys via <code>categoryLabels</code>, keeping the UI fully dynamic.</li>
+      <li>Each <code>ScoringSystem</code> owns its <code>calculateStandings</code> — no forced shared pipeline. The <code>simpleScoring</code> helper is opt-in for stateless systems.</li>
+      <li>Ladder's <code>totalPoints</code> = final ELO rating (not a cumulative sum). The chart component detects this and adjusts the Y-axis accordingly.</li>
+      <li>CSV files are imported as raw strings via Vite's <code>?raw</code> suffix, so they're bundled at build time and benefit from HMR during development.</li>
+      <li>Games are always processed in sequential ID order, which is critical for stateful systems (Ladder, Hot Streak).</li>
+    </ul>
+
+    <h3>Modifying the UI</h3>
+    <ul style="margin-left: 20px; margin-bottom: 14px;">
+      <li><strong>Leaderboard columns</strong> — adapt automatically from <code>system.categoryLabels</code>. No changes needed when adding new scoring systems.</li>
+      <li><strong>Game detail columns</strong> — same dynamic rendering via <code>categoryLabels</code> in <code>GameCard.tsx</code>.</li>
+      <li><strong>Point color scaling</strong> — uses <code>system.maxPerGame</code> to set thresholds (perfect ≥ max, great ≥ 75%, good ≥ 50%, ok ≥ 1, zero = 0).</li>
+      <li><strong>Chart</strong> — shows cumulative scores (or ELO rating) over time. Colors are from a fixed 12-color palette.</li>
+      <li><strong>All styles</strong> — in <code>src/App.css</code> and <code>src/index.css</code>. Uses CSS custom properties for dark/light mode.</li>
+    </ul>
+
+    <hr style="margin: 48px 0 24px; border: none; border-top: 1px solid var(--border);">
+    <p style="text-align: center; font-size: 0.85rem; color: var(--text);">
+      World Cup Predictions App — Built with React + Vite + TypeScript
+    </p>
+  </div>
+</body>
+</html>

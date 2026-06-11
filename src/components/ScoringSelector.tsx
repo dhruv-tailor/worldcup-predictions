@@ -1,11 +1,22 @@
 import type { ScoringSystem } from '../types';
 
 interface ScoringSelectorProps {
+  /** All available scoring systems */
   systems: ScoringSystem[];
+  /** The currently active scoring system */
   selected: ScoringSystem;
+  /** Callback when the user picks a different system */
   onSelect: (system: ScoringSystem) => void;
 }
 
+/**
+ * Dropdown selector for switching between scoring systems.
+ *
+ * Renders a `<select>` populated from the systems array, with the
+ * selected system's description shown alongside. The dropdown options
+ * auto-populate from the scoring system registry — adding a new system
+ * to the array in `scoring.ts` automatically makes it available here.
+ */
 export default function ScoringSelector({ systems, selected, onSelect }: ScoringSelectorProps) {
   return (
     <div className="scoring-selector">

@@ -1,9 +1,27 @@
+/**
+ * CSV data parsing utilities.
+ *
+ * Both CSV files use semicolons as delimiters and are imported as raw strings
+ * via Vite's `?raw` suffix. PapaParse handles the parsing with header mode
+ * so column names map directly to object keys.
+ *
+ * @module parseData
+ */
+
 import Papa from 'papaparse';
 import type { Game, Prediction } from '../types';
 
 import gamesRaw from '../data/games.csv?raw';
 import predictionsRaw from '../data/predictions.csv?raw';
 
+/**
+ * Parses the games CSV into typed {@link Game} objects.
+ *
+ * CSV format: `id;home;away;home_score;away_score`
+ * - Empty score fields are parsed as `null` (game not yet played)
+ *
+ * @returns Array of all games, both played and unplayed
+ */
 export function parseGames(): Game[] {
   const result = Papa.parse(gamesRaw, {
     delimiter: ';',
@@ -20,6 +38,14 @@ export function parseGames(): Game[] {
   }));
 }
 
+/**
+ * Parses the predictions CSV into typed {@link Prediction} objects.
+ *
+ * CSV format: `name;game_id;home_score;away_score`
+ * - Each row is one player's predicted score for one game
+ *
+ * @returns Array of all predictions across all players and games
+ */
 export function parsePredictions(): Prediction[] {
   const result = Papa.parse(predictionsRaw, {
     delimiter: ';',
