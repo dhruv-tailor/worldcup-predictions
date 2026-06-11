@@ -254,25 +254,28 @@
     <div class="scoring-card">
       <h3>Gambler's <span class="badge badge-context">Context-Aware</span> <span class="max-pts">Variable pts</span></h3>
       <p>
-        Rewards going against the grain. The fewer people who predicted the same outcome as you,
-        the bigger your payoff when you're right. Wrong winner = 0 points.
+        High risk, high reward. The fewer people who predicted the same outcome as you,
+        the bigger your payoff when right — but the bigger your loss when wrong.
       </p>
       <div class="formula">
         <code>multiplier = totalPlayers / playersWhoPickedSameOutcome</code><br>
         <code>base = 1 (correct winner) + 2 (if exact score)</code><br>
-        <code>total = round(base × multiplier)</code>
+        <code>Correct: total = round(base × multiplier)</code><br>
+        <code>Wrong: total = −round(multiplier)</code>
       </div>
       <table>
         <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
         <tbody>
           <tr><td>Base</td><td>1–3</td><td>+1 for correct winner, +2 bonus for exact score</td></tr>
-          <tr><td>Uniqueness Bonus</td><td>varies</td><td>round(base × multiplier) − base</td></tr>
+          <tr><td>Uniqueness Bonus</td><td>varies</td><td>Correct: round(base × multiplier) − base</td></tr>
+          <tr><td>Risk Penalty</td><td>−multiplier</td><td>Wrong: −round(multiplier) — contrarian misses hurt more</td></tr>
         </tbody>
       </table>
       <div class="example">
-        <strong>Example:</strong> 11 players, only 2 predicted a draw, draw happens.
-        multiplier = 11 / 2 = 5.5 → total = round(1 × 5.5) = <strong>6 points</strong>.
-        If 9 out of 11 predicted home win and home wins: multiplier = 11 / 9 ≈ 1.2 → total = <strong>1 point</strong>.
+        <strong>Win example:</strong> 11 players, only 2 predicted a draw, draw happens.
+        multiplier = 5.5 → total = round(1 × 5.5) = <strong>+6 points</strong>.<br>
+        <strong>Loss example:</strong> Same setup but home wins.
+        Those 2 draw pickers: penalty = −round(5.5) = <strong>−6 points</strong>.
       </div>
     </div>
 
@@ -298,6 +301,36 @@
       <div class="example">
         <strong>Key insight:</strong> Beating a higher-rated player earns more ELO.
         Losing to a lower-rated player costs more. Equal predictions = draw (Δ ≈ 0).
+      </div>
+    </div>
+
+    <!-- Black Sheep -->
+    <div class="scoring-card">
+      <h3>Black Sheep <span class="badge badge-context">Context-Aware</span> <span class="max-pts">Variable pts</span></h3>
+      <p>
+        Your benchmark is the crowd. Beat the average prediction and gain points;
+        do worse than the crowd and <strong>lose points</strong>. Consistency matters.
+      </p>
+      <div class="formula">
+        <code>crowdError = |avgHome − actualHome| + |avgAway − actualAway|</code><br>
+        <code>playerError = |predictedHome − actualHome| + |predictedAway − actualAway|</code><br>
+        <code>edge = crowdError − playerError</code><br>
+        <code>points = round(edge × 2)</code> — positive or <strong>negative</strong><br>
+        <code>bonus = +1 for exact score</code>
+      </div>
+      <table>
+        <thead><tr><th>Situation</th><th>Points</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Beat crowd by 2</td><td>+4</td><td>Crowd error 3, your error 1 → edge 2 → +4 pts</td></tr>
+          <tr><td>Beat crowd by 0.5</td><td>+1</td><td>Crowd error 1.5, your error 1 → edge 0.5 → +1 pt</td></tr>
+          <tr><td>Tied with crowd</td><td>0</td><td>Same error as crowd → edge 0 → 0 pts</td></tr>
+          <tr><td>Worse than crowd</td><td>−penalty</td><td>Your error &gt; crowd error → negative points</td></tr>
+          <tr><td>Exact score</td><td>+1 bonus</td><td>Always awarded on top of edge points</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Key insight:</strong> Unlike Gambler's (outcome risk), Black Sheep tracks <em>accuracy</em>
+        vs. the group mean. Consistently better predictions are rewarded; consistently worse ones are punished.
       </div>
     </div>
 
@@ -328,13 +361,13 @@
     <div class="scoring-card">
       <h3>Equal Aggregate <span class="badge badge-context">Meta</span> <span class="max-pts">Max 100 pts/game</span></h3>
       <p>
-        A "consensus" ranking that combines all 5 base scoring systems equally.
+        A "consensus" ranking that combines all 6 base scoring systems equally.
         Each system's raw scores are normalized to a 0–100 scale per game using
         min-max normalization, then averaged.
       </p>
       <div class="formula">
         <code>normalized = (score − min) / (max − min) × 100</code><br>
-        <code>total = average of all 5 normalized scores</code>
+        <code>total = average of all 6 normalized scores</code>
       </div>
       <table>
         <thead><tr><th>Column</th><th>Value</th><th>Meaning</th></tr></thead>
@@ -342,6 +375,7 @@
           <tr><td>TC</td><td>0–100</td><td>Normalized Ted Classic score</td></tr>
           <tr><td>T+</td><td>0–100</td><td>Normalized Ted+ score</td></tr>
           <tr><td>Gam</td><td>0–100</td><td>Normalized Gambler's score</td></tr>
+          <tr><td>BS</td><td>0–100</td><td>Normalized Black Sheep score</td></tr>
           <tr><td>Lad</td><td>0–100</td><td>Normalized Ladder (ELO) delta</td></tr>
           <tr><td>HS</td><td>0–100</td><td>Normalized Hot Streak score</td></tr>
         </tbody>
@@ -368,6 +402,7 @@
           <tr><td>Ted Classic</td><td>×1.0</td><td>Baseline scoring</td></tr>
           <tr><td>Ted+</td><td>×1.0</td><td>Enhanced baseline</td></tr>
           <tr><td>Gambler's</td><td>×2.0</td><td>Rewards bold, contrarian predictions</td></tr>
+          <tr><td>Black Sheep</td><td>×1.5</td><td>Rewards individual insight over groupthink</td></tr>
           <tr><td>Ladder (ELO)</td><td>×1.5</td><td>Competitive head-to-head ranking</td></tr>
           <tr><td>Hot Streak</td><td>×1.5</td><td>Rewards consistency over time</td></tr>
         </tbody>
@@ -391,7 +426,7 @@
         <tr>
           <td><span class="badge badge-context">Context-Aware</span></td>
           <td>Needs all predictions for a game to calculate (e.g., uniqueness multiplier)</td>
-          <td>Gambler's</td>
+          <td>Gambler's, Black Sheep</td>
         </tr>
         <tr>
           <td><span class="badge badge-stateful">Stateful</span></td>
@@ -435,6 +470,7 @@
         ├── <span class="file">tedClassic.ts</span><span class="desc">— Ted Classic scoring system</span>
         ├── <span class="file">tedPlus.ts</span>   <span class="desc">— Ted+ scoring system</span>
         ├── <span class="file">gamblers.ts</span>  <span class="desc">— Gambler's Mode scoring system</span>
+        ├── <span class="file">blackSheep.ts</span> <span class="desc">— Black Sheep scoring system</span>
         ├── <span class="file">ladder.ts</span>    <span class="desc">— Ladder (ELO) scoring system</span>
         ├── <span class="file">hotStreak.ts</span> <span class="desc">— Hot Streak scoring system</span>
         ├── <span class="file">equalAggregate.ts</span> <span class="desc">— Equal Aggregate (meta) scoring system</span>
@@ -500,7 +536,7 @@ interface ScoringSystem {
         <tr>
           <td><strong>Context-aware</strong> — needs all predictions per game</td>
           <td>Custom <code>calculateStandings</code> method</td>
-          <td>Gambler's</td>
+          <td>Gambler's, Black Sheep</td>
         </tr>
         <tr>
           <td><strong>Stateful</strong> — cumulative state across games</td>

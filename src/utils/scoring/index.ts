@@ -13,6 +13,7 @@ import type { ScoringSystem } from '../../types';
 import tedClassic from './tedClassic';
 import tedPlus from './tedPlus';
 import gamblers from './gamblers';
+import blackSheep from './blackSheep';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
 import equalAggregate from './equalAggregate';
@@ -23,6 +24,7 @@ export const scoringSystems: ScoringSystem[] = [
   tedClassic,
   tedPlus,
   gamblers,
+  blackSheep,
   ladder,
   hotStreak,
   equalAggregate,

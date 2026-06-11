@@ -16,17 +16,7 @@
 import type { ScoringSystem } from '../../types';
 import { getWinner, simpleScoring } from './helpers';
 
-const tedPlus: ScoringSystem = {
-  name: 'Ted+',
-  description: '+2 winner (+3 draw), +1 GD, +1 total goals, +2 exact score',
-  categoryLabels: [
-    { key: 'winner', label: 'Winner' },
-    { key: 'goalDifference', label: 'GD' },
-    { key: 'totalGoals', label: 'Goals' },
-    { key: 'exactScore', label: 'Exact' },
-  ],
-  maxPerGame: 7,
-  calculateStandings: simpleScoring((game, prediction) => {
+const baseCalculate = simpleScoring((game, prediction) => {
     if (game.homeScore === null || game.awayScore === null) {
       return { categories: { winner: 0, goalDifference: 0, totalGoals: 0, exactScore: 0 }, total: 0 };
     }
@@ -50,7 +40,26 @@ const tedPlus: ScoringSystem = {
       categories: { winner, goalDifference, totalGoals, exactScore },
       total: winner + goalDifference + totalGoals + exactScore,
     };
-  }),
+  });
+
+const tedPlus: ScoringSystem = {
+  name: 'Ted+',
+  description: '+2 winner (+3 draw), +1 GD, +1 total goals, +2 exact score',
+  categoryLabels: [
+    { key: 'winner', label: 'Winner' },
+    { key: 'goalDifference', label: 'GD' },
+    { key: 'totalGoals', label: 'Goals' },
+    { key: 'exactScore', label: 'Exact' },
+  ],
+  maxPerGame: 7,
+  calculateStandings(games, predictions) {
+    const standings = baseCalculate(games, predictions);
+    for (const player of standings) {
+      player.exactCount = player.gameBreakdowns.filter((gb) => gb.points.categories.exactScore > 0).length;
+      player.perfectCount = player.gameBreakdowns.filter((gb) => gb.points.total === 7).length;
+    }
+    return standings;
+  },
 };
 
 export default tedPlus;

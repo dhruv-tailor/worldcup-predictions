@@ -31,10 +31,14 @@ const ladder: ScoringSystem = {
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
     const playerNames = [...new Set(predictions.map((p) => p.name))];
     const ratings = new Map<string, number>();
+    const peakRatings = new Map<string, number>();
+    const lowRatings = new Map<string, number>();
     const playerBreakdowns = new Map<string, GameBreakdown[]>();
 
     for (const name of playerNames) {
       ratings.set(name, 1000);
+      peakRatings.set(name, 1000);
+      lowRatings.set(name, 1000);
       playerBreakdowns.set(name, []);
     }
 
@@ -98,7 +102,10 @@ const ladder: ScoringSystem = {
       // Apply rating changes and record per-game breakdowns
       for (const [name, delta] of deltas) {
         const roundedDelta = Math.round(delta);
-        ratings.set(name, ratings.get(name)! + roundedDelta);
+        const newRating = ratings.get(name)! + roundedDelta;
+        ratings.set(name, newRating);
+        if (newRating > peakRatings.get(name)!) peakRatings.set(name, newRating);
+        if (newRating < lowRatings.get(name)!) lowRatings.set(name, newRating);
         playerBreakdowns.get(name)!.push({
           gameId: game.id,
           prediction: rawScores.get(name)!.prediction,
@@ -110,7 +117,13 @@ const ladder: ScoringSystem = {
     // Final standings: totalPoints = current ELO rating (not a cumulative sum)
     const standings: PlayerScore[] = [];
     for (const [name, breakdowns] of playerBreakdowns) {
-      standings.push({ name, totalPoints: ratings.get(name)!, gameBreakdowns: breakdowns });
+      standings.push({
+        name,
+        totalPoints: ratings.get(name)!,
+        gameBreakdowns: breakdowns,
+        peakRating: peakRatings.get(name)!,
+        lowestRating: lowRatings.get(name)!,
+      });
     }
     standings.sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
     return standings;

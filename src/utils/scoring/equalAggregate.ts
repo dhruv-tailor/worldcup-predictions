@@ -20,17 +20,19 @@ import type { Game, Prediction, ScoringSystem, PlayerScore, GameBreakdown } from
 import tedClassic from './tedClassic';
 import tedPlus from './tedPlus';
 import gamblers from './gamblers';
+import blackSheep from './blackSheep';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
 
 /** Base scoring systems to aggregate */
-const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, ladder, hotStreak];
+const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak];
 
 /** Short labels for per-game breakdown columns */
 const systemLabels: { key: string; label: string }[] = [
   { key: 'tc', label: 'TC' },
   { key: 'tp', label: 'T+' },
   { key: 'gam', label: 'Gam' },
+  { key: 'bs', label: 'BS' },
   { key: 'lad', label: 'Lad' },
   { key: 'hs', label: 'HS' },
 ];
@@ -48,7 +50,7 @@ function normalize(scores: number[]): number[] {
 
 const equalAggregate: ScoringSystem = {
   name: 'Equal Aggregate',
-  description: 'Normalized average across all 5 scoring systems, weighted equally',
+  description: 'Normalized average across all 6 scoring systems, weighted equally',
   categoryLabels: systemLabels,
   maxPerGame: 100,
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
@@ -126,7 +128,17 @@ const equalAggregate: ScoringSystem = {
     const standings: PlayerScore[] = [];
     for (const [name, breakdowns] of playerBreakdowns) {
       const totalPoints = breakdowns.reduce((sum, gb) => sum + gb.points.total, 0);
-      standings.push({ name, totalPoints, gameBreakdowns: breakdowns });
+      // Compute best/worst system by average normalized score
+      const systemAvgs = systemLabels.map((lbl) => {
+        const vals = breakdowns.map((gb) => gb.points.categories[lbl.key] ?? 0);
+        return { label: lbl.label, avg: vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0 };
+      });
+      systemAvgs.sort((a, b) => b.avg - a.avg);
+      standings.push({
+        name, totalPoints, gameBreakdowns: breakdowns,
+        bestSystem: systemAvgs[0]?.label,
+        worstSystem: systemAvgs[systemAvgs.length - 1]?.label,
+      });
     }
     standings.sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
     return standings;

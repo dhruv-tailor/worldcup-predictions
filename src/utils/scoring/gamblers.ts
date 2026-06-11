@@ -1,17 +1,20 @@
 /**
- * **Gambler's Mode** — Rewards going against the grain.
+ * **Gambler's Mode** — High risk, high reward.
  *
  * Uses a uniqueness multiplier based on how many players predicted the same outcome.
- * Fewer people agreeing with you = bigger payoff when you're right.
+ * Fewer people agreeing with you = bigger payoff when right, bigger loss when wrong.
  *
  * **Formula:**
  * - `base` = 1 for correct winner, +2 bonus for exact score
  * - `multiplier` = totalPlayers / playersWhoPickedSameOutcome
- * - `uniqueBonus` = round(base × multiplier) − base
- * - Wrong winner = 0 points
+ * - Correct: `uniqueBonus` = round(base × multiplier) − base
+ * - Wrong: `uniqueBonus` = −round(multiplier) (risk penalty)
  *
- * **Example:** 11 players, only 2 predicted a draw, draw happens:
+ * **Example (win):** 11 players, only 2 predicted a draw, draw happens:
  * - base = 1, multiplier = 11/2 = 5.5, total = round(5.5) = 6 points
+ *
+ * **Example (loss):** 11 players, only 1 predicted away win, home wins:
+ * - multiplier = 11/1 = 11, penalty = −11 points
  *
  * Requires all predictions for a game (context-aware), so it uses a custom
  * `calculateStandings` instead of the `simpleScoring` helper.
@@ -24,7 +27,7 @@ import { getWinner } from './helpers';
 
 const gamblers: ScoringSystem = {
   name: "Gambler's",
-  description: '+1 correct winner (+2 exact) × uniqueness multiplier',
+  description: '+1 correct winner (+2 exact) × multiplier; wrong = −multiplier',
   categoryLabels: [
     { key: 'base', label: 'Base' },
     { key: 'uniqueBonus', label: 'Bonus' },
@@ -32,10 +35,12 @@ const gamblers: ScoringSystem = {
   maxPerGame: 15,
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
     const playerMap = new Map<string, GameBreakdown[]>();
+    const playerMultipliers = new Map<string, number[]>();
 
     for (const prediction of predictions) {
       if (!playerMap.has(prediction.name)) {
         playerMap.set(prediction.name, []);
+        playerMultipliers.set(prediction.name, []);
       }
     }
 
@@ -67,20 +72,23 @@ const gamblers: ScoringSystem = {
       for (const prediction of gamePredictions) {
         const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
         const correct = predictedWinner === actualWinner;
+        const sameOutcomeCount = outcomeCounts[predictedWinner];
+        const multiplier = totalPlayers / sameOutcomeCount;
 
         if (!correct) {
+          // Risk penalty: the same multiplier that would have boosted a correct
+          // pick now hurts — contrarian wrong picks cost more.
+          const penalty = -Math.round(multiplier);
           playerMap.get(prediction.name)!.push({
             gameId: game.id,
             prediction,
-            points: { categories: { base: 0, uniqueBonus: 0 }, total: 0 },
+            points: { categories: { base: 0, uniqueBonus: penalty }, total: penalty },
           });
+          playerMultipliers.get(prediction.name)!.push(multiplier);
           continue;
         }
 
         // Uniqueness multiplier: ratio of total players to those who picked the same outcome
-        const sameOutcomeCount = outcomeCounts[actualWinner];
-        const multiplier = totalPlayers / sameOutcomeCount;
-
         // Base points: +1 for correct winner, +2 bonus for exact score match
         let base = 1;
         const isExact = game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore;
@@ -95,13 +103,17 @@ const gamblers: ScoringSystem = {
           prediction,
           points: { categories: { base, uniqueBonus }, total: base + uniqueBonus },
         });
+        playerMultipliers.get(prediction.name)!.push(multiplier);
       }
     }
 
     const standings: PlayerScore[] = [];
     for (const [name, gameBreakdowns] of playerMap) {
       const totalPoints = gameBreakdowns.reduce((sum, gb) => sum + gb.points.total, 0);
-      standings.push({ name, totalPoints, gameBreakdowns });
+      const multipliers = playerMultipliers.get(name)!;
+      const bestMultiplier = multipliers.length > 0 ? Math.round(Math.max(...multipliers) * 10) / 10 : 0;
+      const avgMultiplier = multipliers.length > 0 ? Math.round((multipliers.reduce((a, b) => a + b, 0) / multipliers.length) * 10) / 10 : 0;
+      standings.push({ name, totalPoints, gameBreakdowns, bestMultiplier, avgMultiplier });
     }
     standings.sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
     return standings;

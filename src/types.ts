@@ -67,6 +67,28 @@ export interface PlayerScore {
   currentStreak?: number;
   /** Longest consecutive correct-winner streak achieved (Hot Streak only) */
   longestStreak?: number;
+  /** Number of exact score predictions (Ted Classic, Ted+) */
+  exactCount?: number;
+  /** Percentage of played games with correct winner prediction (Ted Classic) */
+  winnerPct?: number;
+  /** Number of games scoring maximum points (Ted+) */
+  perfectCount?: number;
+  /** Highest uniqueness multiplier achieved on a correct prediction (Gambler's) */
+  bestMultiplier?: number;
+  /** Average uniqueness multiplier across correct predictions (Gambler's) */
+  avgMultiplier?: number;
+  /** Highest ELO rating ever achieved (Ladder) */
+  peakRating?: number;
+  /** Lowest ELO rating ever reached (Ladder) */
+  lowestRating?: number;
+  /** Percentage of games where player beat the crowd average (Black Sheep) */
+  crowdBeatPct?: number;
+  /** Average edge over the crowd across all games (Black Sheep) */
+  avgEdge?: number;
+  /** Base system with highest average normalized score (Aggregates) */
+  bestSystem?: string;
+  /** Base system with lowest average normalized score (Aggregates) */
+  worstSystem?: string;
 }
 
 /**

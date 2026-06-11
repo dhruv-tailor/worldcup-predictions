@@ -26,7 +26,8 @@ interface LeaderboardProps {
  */
 export default function Leaderboard({ standings, games, system, onSelectGame }: LeaderboardProps) {
   const playedGames = games.filter((g) => g.homeScore !== null).sort((a, b) => a.id - b.id);
-  const isHotStreak = system.name === 'Hot Streak';
+  const sysName = system.name;
+  const lastGameId = playedGames.length > 0 ? playedGames[playedGames.length - 1].id : null;
 
   return (
     <div className="leaderboard">
@@ -46,8 +47,21 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
               </th>
             ))}
             <th className="total-col">Total</th>
-            {isHotStreak && <th className="streak-col" title="Current streak">🔥</th>}
-            {isHotStreak && <th className="streak-col" title="Longest streak">Best</th>}
+            {lastGameId != null && <th className="delta-col" title="Change from last game">+/−</th>}
+            {sysName === 'Ted Classic' && <th className="stat-col" title="Exact score predictions">🎯</th>}
+            {sysName === 'Ted Classic' && <th className="stat-col" title="Correct winner percentage">Win%</th>}
+            {sysName === 'Ted+' && <th className="stat-col" title="Exact score predictions">🎯</th>}
+            {sysName === 'Ted+' && <th className="stat-col" title="Perfect games (7 pts)">⭐</th>}
+            {sysName === "Gambler's" && <th className="stat-col" title="Best multiplier">Best×</th>}
+            {sysName === "Gambler's" && <th className="stat-col" title="Average multiplier">Avg×</th>}
+            {sysName === 'Black Sheep' && <th className="stat-col" title="% of games beating the crowd">Beat%</th>}
+            {sysName === 'Black Sheep' && <th className="stat-col" title="Average edge over crowd">Edge</th>}
+            {sysName === 'Ladder' && <th className="stat-col" title="Peak ELO rating">Peak</th>}
+            {sysName === 'Ladder' && <th className="stat-col" title="Lowest ELO rating">Low</th>}
+            {sysName === 'Hot Streak' && <th className="streak-col" title="Current streak">🔥</th>}
+            {sysName === 'Hot Streak' && <th className="streak-col" title="Longest streak">Best</th>}
+            {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <th className="stat-col" title="Best performing system">Best</th>}
+            {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <th className="stat-col" title="Worst performing system">Worst</th>}
           </tr>
         </thead>
         <tbody>
@@ -70,12 +84,33 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
                 );
               })}
               <td className="total-col">{player.totalPoints}</td>
-              {isHotStreak && (
+              {lastGameId != null && (() => {
+                const lastBreakdown = player.gameBreakdowns.find((gb) => gb.gameId === lastGameId);
+                const delta = lastBreakdown?.points.total ?? 0;
+                return (
+                  <td className={`delta-col ${delta > 0 ? 'delta-pos' : delta < 0 ? 'delta-neg' : ''}`}>
+                    {lastBreakdown ? (delta >= 0 ? `+${delta}` : `${delta}`) : '-'}
+                  </td>
+                );
+              })()}
+              {sysName === 'Ted Classic' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
+              {sysName === 'Ted Classic' && <td className="stat-col">{player.winnerPct != null ? `${player.winnerPct}%` : '-'}</td>}
+              {sysName === 'Ted+' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
+              {sysName === 'Ted+' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
+              {sysName === "Gambler's" && <td className="stat-col">{player.bestMultiplier ? `×${player.bestMultiplier}` : '-'}</td>}
+              {sysName === "Gambler's" && <td className="stat-col">{player.avgMultiplier ? `×${player.avgMultiplier}` : '-'}</td>}
+              {sysName === 'Black Sheep' && <td className="stat-col">{player.crowdBeatPct != null ? `${player.crowdBeatPct}%` : '-'}</td>}
+              {sysName === 'Black Sheep' && <td className="stat-col">{player.avgEdge != null ? `${player.avgEdge}` : '-'}</td>}
+              {sysName === 'Ladder' && <td className="stat-col">{player.peakRating ?? '-'}</td>}
+              {sysName === 'Ladder' && <td className="stat-col">{player.lowestRating ?? '-'}</td>}
+              {sysName === 'Hot Streak' && (
                 <td className="streak-col">{player.currentStreak ? `${player.currentStreak}` : '-'}</td>
               )}
-              {isHotStreak && (
+              {sysName === 'Hot Streak' && (
                 <td className="streak-col">{player.longestStreak ? `${player.longestStreak}` : '-'}</td>
               )}
+              {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <td className="stat-col">{player.bestSystem ?? '-'}</td>}
+              {(sysName === 'Equal Aggregate' || sysName === 'Weighted Aggregate') && <td className="stat-col">{player.worstSystem ?? '-'}</td>}
             </tr>
           ))}
         </tbody>
@@ -90,8 +125,8 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
  * For all other systems, shows the raw number.
  */
 function formatDelta(points: number, system: ScoringSystem): string {
-  // For Ladder, show +/- sign
-  if (system.name === 'Ladder') {
+  // For systems with negative per-game values, show +/- sign
+  if (system.name === 'Ladder' || system.name === "Gambler's" || system.name === 'Black Sheep') {
     return points >= 0 ? `+${points}` : `${points}`;
   }
   return `${points}`;

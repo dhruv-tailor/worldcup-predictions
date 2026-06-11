@@ -25,6 +25,37 @@ describe("Gambler's", () => {
     expect(alice.totalPoints).toBe(3);
   });
 
+  it('penalizes wrong predictions based on multiplier', () => {
+    // 3 players, Bob and Charlie predicted away (wrong). multiplier = 3/2 = 1.5
+    const predictions: Prediction[] = [
+      pred('Alice', 1, 2, 0),   // home win — correct
+      pred('Bob', 1, 0, 1),     // away win — wrong
+      pred('Charlie', 1, 0, 2), // away win — wrong
+    ];
+    const standings = gamblers.calculateStandings([game], predictions);
+
+    const bob = standings.find((s) => s.name === 'Bob')!;
+    // multiplier = 3/2 = 1.5, penalty = -round(1.5) = -2
+    expect(bob.gameBreakdowns[0].points.categories.base).toBe(0);
+    expect(bob.gameBreakdowns[0].points.categories.uniqueBonus).toBe(-2);
+    expect(bob.totalPoints).toBe(-2);
+  });
+
+  it('penalizes contrarian wrong picks more heavily', () => {
+    // 4 players, only Dave predicted draw (wrong). multiplier = 4/1 = 4
+    const predictions: Prediction[] = [
+      pred('Alice', 1, 3, 0),
+      pred('Bob', 1, 2, 0),
+      pred('Charlie', 1, 1, 0),
+      pred('Dave', 1, 1, 1), // draw — wrong, alone
+    ];
+    const standings = gamblers.calculateStandings([game], predictions);
+
+    const dave = standings.find((s) => s.name === 'Dave')!;
+    // multiplier = 4/1 = 4, penalty = -4
+    expect(dave.totalPoints).toBe(-4);
+  });
+
   it('awards smaller bonus when many agree', () => {
     // 3 players all predict home win correctly
     const predictions: Prediction[] = [
@@ -53,11 +84,12 @@ describe("Gambler's", () => {
     expect(alice.totalPoints).toBe(6);
   });
 
-  it('gives 0 for wrong winner', () => {
+  it('penalizes sole wrong predictor with full multiplier', () => {
+    // Only Alice, predicted wrong. multiplier = 1/1 = 1, penalty = -1
     const predictions: Prediction[] = [pred('Alice', 1, 0, 3)];
     const standings = gamblers.calculateStandings([game], predictions);
 
-    expect(standings[0].totalPoints).toBe(0);
+    expect(standings[0].totalPoints).toBe(-1);
   });
 
   it('uses per-game prediction count for multiplier', () => {
