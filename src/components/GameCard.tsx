@@ -1,4 +1,5 @@
 import type { Game, PlayerScore, ScoringSystem } from '../types';
+import { getGameLabel } from '../utils/flags';
 
 interface GameCardProps {
   /** The game to show details for */
@@ -41,11 +42,11 @@ export default function GameCard({ game, standings, system, onClose }: GameCardP
           ← Back
         </button>
         <h2>
-          Game {game.id}: {game.home} vs {game.away}
+          {getGameLabel(game)}
         </h2>
         {isPlayed ? (
           <div className="actual-score">
-            Final: {game.home} {game.homeScore} – {game.awayScore} {game.away}
+            Final: {game.home} {game.homeScore}{game.homeScore! > game.awayScore! ? ' 🏆' : ''} – {game.awayScore! > game.homeScore! ? '🏆 ' : ''}{game.awayScore} {game.away}
           </div>
         ) : (
           <div className="actual-score pending">Not yet played</div>

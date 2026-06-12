@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { PlayerScore, Game, ScoringSystem } from '../types';
+import { getGameLabelShort } from '../utils/flags';
 
 interface ScoreChartProps {
   /** Sorted player standings from the active scoring system */
@@ -60,7 +61,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
 
     for (const game of playedGames) {
       const entry: Record<string, string | number> = {
-        game: `G${game.id}`,
+        game: getGameLabelShort(game),
         gameLabel: `${game.home} vs ${game.away}`,
       };
 

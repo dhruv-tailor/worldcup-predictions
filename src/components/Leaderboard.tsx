@@ -1,4 +1,5 @@
 import type { PlayerScore, Game, ScoringSystem } from '../types';
+import { getGameLabelShort } from '../utils/flags';
 
 interface LeaderboardProps {
   /** Sorted player standings from the active scoring system */
@@ -61,7 +62,7 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
                 onClick={() => onSelectGame(game.id)}
                 title={`${game.home} vs ${game.away}`}
               >
-                G{game.id}
+                {getGameLabelShort(game)}
               </th>
             ))}
           </tr>
