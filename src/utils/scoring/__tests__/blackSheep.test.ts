@@ -7,12 +7,12 @@ const pred = (name: string, gameId: number, h: number, a: number): Prediction =>
 });
 
 describe('Black Sheep', () => {
-  it('awards points when player beats the crowd average', () => {
+  it('awards points when player beats the crowd mode', () => {
     const games: Game[] = [{ id: 1, home: 'A', away: 'B', homeScore: 2, awayScore: 1 }];
-    // Crowd avg: home=(2+0)/2=1, away=(1+3)/2=2
-    // Crowd error: |1-2|+|2-1|=2
-    // Alice error: |2-2|+|1-1|=0, edge=2, points=round(2*2)=4
-    // Bob error: |0-2|+|3-1|=4, edge=2-4=-2, points=0
+    // No duplicate predictions → each is equally "the mode"; tie broken by smallest error
+    // Alice(2,1) error=0, Bob(0,3) error=4 → mode=(2,1), crowdError=0
+    // Alice matches mode → edge=0, +1 bonus (exact) = 1
+    // Bob error=4, edge=0-4=-4, points=round(-8)=-8
     const predictions: Prediction[] = [
       pred('Alice', 1, 2, 1), // exact
       pred('Bob', 1, 0, 3),   // way off
@@ -22,10 +22,10 @@ describe('Black Sheep', () => {
     const alice = standings.find((s) => s.name === 'Alice')!;
     const bob = standings.find((s) => s.name === 'Bob')!;
 
-    expect(alice.gameBreakdowns[0].points.categories.edge).toBe(4);
+    expect(alice.gameBreakdowns[0].points.categories.edge).toBe(0);
     expect(alice.gameBreakdowns[0].points.categories.bonus).toBe(1); // exact
-    expect(alice.totalPoints).toBe(5);
-    expect(bob.totalPoints).toBe(-4); // edge=-2, points=round(-4)=-4
+    expect(alice.totalPoints).toBe(1);
+    expect(bob.totalPoints).toBe(-8);
   });
 
   it('awards exact score bonus even when not beating crowd', () => {
@@ -40,21 +40,28 @@ describe('Black Sheep', () => {
     expect(standings[0].totalPoints).toBe(1);
   });
 
-  it('penalizes when crowd is closer than player', () => {
+  it('gives 0 to crowd followers who predicted the mode', () => {
     const games: Game[] = [{ id: 1, home: 'A', away: 'B', homeScore: 1, awayScore: 1 }];
-    // 3 players: crowd avg home=(1+1+5)/3=2.33, away=(1+0+0)/3=0.33
-    // Crowd error: |2.33-1|+|0.33-1| = 1.33 + 0.67 = 2.0
-    // Charlie error: |5-1|+|0-1| = 5, edge = 2-5 = -3, points = round(-6) = -6
+    // Mode = (1,0) with count=2, error=|1-1|+|0-1|=1
+    // Alice predicted (1,1) — not the mode, error=0, edge=1-0=1, pts=round(2)=2
+    // Bob predicted (1,0) — IS the mode, edge=0, pts=0
+    // Charlie predicted (5,0) — not mode, error=5, edge=1-5=-4, pts=round(-8)=-8
     const predictions: Prediction[] = [
       pred('Alice', 1, 1, 1),
       pred('Bob', 1, 1, 0),
-      pred('Charlie', 1, 5, 0),
+      pred('Charlie', 1, 1, 0),
     ];
     const standings = blackSheep.calculateStandings(games, predictions);
 
+    const alice = standings.find((s) => s.name === 'Alice')!;
+    const bob = standings.find((s) => s.name === 'Bob')!;
     const charlie = standings.find((s) => s.name === 'Charlie')!;
-    expect(charlie.gameBreakdowns[0].points.categories.edge).toBe(-6);
-    expect(charlie.totalPoints).toBe(-6);
+    expect(alice.gameBreakdowns[0].points.categories.edge).toBe(2);
+    expect(alice.totalPoints).toBe(3); // 2 edge + 1 exact bonus
+    expect(bob.gameBreakdowns[0].points.categories.edge).toBe(0);
+    expect(bob.totalPoints).toBe(0);
+    expect(charlie.gameBreakdowns[0].points.categories.edge).toBe(0);
+    expect(charlie.totalPoints).toBe(0);
   });
 
   it('handles unplayed games (0 points)', () => {
@@ -99,23 +106,20 @@ describe('Black Sheep', () => {
     expect(charlie.gameBreakdowns[0].gameId).toBe(2);
   });
 
-  it('computes crowdBeatPct and avgEdge stats', () => {
-    const games: Game[] = [
-      { id: 1, home: 'A', away: 'B', homeScore: 2, awayScore: 1 },
-      { id: 2, home: 'C', away: 'D', homeScore: 0, awayScore: 0 },
-    ];
+  it('penalizes deviators who do worse than the mode', () => {
+    const games: Game[] = [{ id: 1, home: 'A', away: 'B', homeScore: 1, awayScore: 1 }];
+    // Mode = (1,1) count=2, error=0
+    // Charlie predicted (5,0), error=5, edge=0-5=-5, pts=round(-10)=-10
     const predictions: Prediction[] = [
-      pred('Alice', 1, 2, 1), // exact → beats crowd
-      pred('Bob', 1, 0, 3),   // way off → loses to crowd
-      pred('Alice', 2, 0, 0), // exact → beats crowd
-      pred('Bob', 2, 0, 0),   // exact → ties crowd (edge = 0)
+      pred('Alice', 1, 1, 1),
+      pred('Bob', 1, 1, 1),
+      pred('Charlie', 1, 5, 0),
     ];
     const standings = blackSheep.calculateStandings(games, predictions);
 
-    const alice = standings.find((s) => s.name === 'Alice')!;
-    // Alice beat crowd both games
-    expect(alice.crowdBeatPct).toBeGreaterThan(0);
-    expect(alice.avgEdge).toBeGreaterThan(0);
+    const charlie = standings.find((s) => s.name === 'Charlie')!;
+    expect(charlie.gameBreakdowns[0].points.categories.edge).toBe(-10);
+    expect(charlie.totalPoints).toBe(-10);
   });
 
   it('sorts by total points descending', () => {

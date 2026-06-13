@@ -3,7 +3,7 @@
  *
  * Every player starts at **1000 ELO**. For each played game, every pair of
  * players is compared head-to-head. The player with the better prediction
- * (measured by Ted Classic raw score) "wins" the matchup and gains ELO.
+ * (measured by Ted+ raw score) "wins" the matchup and gains ELO.
  *
  * **ELO formula per matchup:**
  * - Expected score: `E_A = 1 / (1 + 10^((R_B - R_A) / 400))`
@@ -20,7 +20,7 @@
  */
 
 import type { Game, Prediction, ScoringSystem, PlayerScore, GameBreakdown } from '../../types';
-import { tedClassicRawScore } from './helpers';
+import { tedPlusRawScore } from './helpers';
 
 const ladder: ScoringSystem = {
   name: 'Ladder',
@@ -59,11 +59,11 @@ const ladder: ScoringSystem = {
         continue;
       }
 
-      // Use Ted Classic raw score (0–4) as the quality measure for each prediction
+      // Use Ted+ raw score (0–7) as the quality measure for each prediction
       const rawScores = new Map<string, { score: number; prediction: Prediction }>();
       for (const prediction of gamePredictions) {
         rawScores.set(prediction.name, {
-          score: tedClassicRawScore(game, prediction),
+          score: tedPlusRawScore(game, prediction),
           prediction,
         });
       }

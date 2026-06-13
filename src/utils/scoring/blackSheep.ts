@@ -1,25 +1,20 @@
 /**
  * **Black Sheep** — Stand out from the flock.
  *
- * For each game, the "crowd prediction" is the average of all players' predictions.
- * Points are awarded based on how much closer your prediction was to the actual
- * result compared to the crowd average — and penalties for doing worse.
+ * For each game, the "crowd prediction" is the mode (most common prediction).
+ * If you follow the crowd (predict the mode), you score 0 — neither gaining nor losing.
+ * If you deviate, you're rewarded for being closer to the actual result than the crowd,
+ * or penalized for being further away.
  *
  * **Formula:**
- * - `crowdError` = |avgHome − actualHome| + |avgAway − actualAway|
+ * - `modeError` = |modeHome − actualHome| + |modeAway − actualAway|
  * - `playerError` = |predictedHome − actualHome| + |predictedAway − actualAway|
- * - `edge` = crowdError − playerError (positive = beat the crowd)
+ * - `edge` = modeError − playerError (positive = beat the crowd)
  * - `points` = round(edge × 2) — positive when you beat the crowd, **negative** when the crowd beats you
  * - `bonus` = +1 for exact score match
  *
- * **Example (win):** Crowd averages 1.5–0.8, actual is 2–1.
- * Crowd error = 0.7. You predicted 2–1 (exact), error = 0. Edge = 0.7. Points = round(1.4) = 1 + 1 bonus = 2.
- *
- * **Example (loss):** Same game, you predicted 0–3, error = 4. Edge = 0.7 − 4 = −3.3.
- * Points = round(−6.6) = −7.
- *
- * Requires all predictions for a game (context-aware), so it uses a custom
- * `calculateStandings` instead of the `simpleScoring` helper.
+ * If your prediction matches the mode, edge is always exactly 0.
+ * Ties for mode are broken by choosing the prediction with the smallest error.
  *
  * @module scoring/blackSheep
  */
@@ -28,7 +23,7 @@ import type { Game, Prediction, ScoringSystem, PlayerScore, GameBreakdown } from
 
 const blackSheep: ScoringSystem = {
   name: 'Black Sheep',
-  description: 'Edge × 2 vs crowd average (can go negative), +1 exact',
+  description: 'Edge × 2 vs crowd mode (can go negative), +1 exact',
   categoryLabels: [
     { key: 'edge', label: 'Edge' },
     { key: 'bonus', label: 'Bonus' },
@@ -68,12 +63,32 @@ const blackSheep: ScoringSystem = {
 
       if (gamePredictions.length === 0) continue;
 
-      // Compute crowd average prediction
-      const avgHome = gamePredictions.reduce((sum, p) => sum + p.homeScore, 0) / gamePredictions.length;
-      const avgAway = gamePredictions.reduce((sum, p) => sum + p.awayScore, 0) / gamePredictions.length;
+      // Find the mode prediction (most common home-away pair).
+      // Ties broken by smallest error vs actual result.
+      const freqMap = new Map<string, { count: number; home: number; away: number }>();
+      for (const p of gamePredictions) {
+        const key = `${p.homeScore}-${p.awayScore}`;
+        const entry = freqMap.get(key);
+        if (entry) {
+          entry.count++;
+        } else {
+          freqMap.set(key, { count: 1, home: p.homeScore, away: p.awayScore });
+        }
+      }
+      let mode = { home: 0, away: 0 };
+      let bestCount = 0;
+      let bestError = Infinity;
+      for (const { count, home, away } of freqMap.values()) {
+        const error = Math.abs(home - game.homeScore!) + Math.abs(away - game.awayScore!);
+        if (count > bestCount || (count === bestCount && error < bestError)) {
+          bestCount = count;
+          bestError = error;
+          mode = { home, away };
+        }
+      }
 
-      // Crowd error vs actual result
-      const crowdError = Math.abs(avgHome - game.homeScore) + Math.abs(avgAway - game.awayScore);
+      // Crowd (mode) error vs actual result
+      const crowdError = Math.abs(mode.home - game.homeScore) + Math.abs(mode.away - game.awayScore);
 
       for (const prediction of gamePredictions) {
         const playerError = Math.abs(prediction.homeScore - game.homeScore) +

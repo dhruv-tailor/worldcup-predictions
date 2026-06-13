@@ -40,12 +40,15 @@ const systemLabels: { key: string; label: string }[] = [
 ];
 
 /**
- * Normalizes an array of scores to 0–100 using min-max scaling.
- * Returns 0 for all if everyone scored 0, 50 if all tied at a non-zero value.
+ * Normalizes an array of scores to 0–100 proportional to the system's max.
+ * A phantom "perfect prediction" (maxPossible) is included in the pool so
+ * that 100 is only reachable by hitting the system's max score.
  */
-function normalize(scores: number[]): number[] {
-  const min = Math.min(...scores);
-  const max = Math.max(...scores);
+function normalize(scores: number[], maxPossible?: number): number[] {
+  // Include the perfect score as a reference point when available
+  const all = maxPossible != null ? [...scores, maxPossible] : scores;
+  const min = Math.min(...all);
+  const max = Math.max(...all);
   if (max === min) return scores.map(() => (max === 0 ? 0 : 50));
   return scores.map((s) => ((s - min) / (max - min)) * 100);
 }
@@ -81,11 +84,11 @@ const equalAggregate: ScoringSystem = {
       });
 
       // Normalize each system's scores for this game
-      const normalizedPerSystem: Map<string, number>[] = perSystemScores.map((scoreMap) => {
+      const normalizedPerSystem: Map<string, number>[] = perSystemScores.map((scoreMap, i) => {
         const scores = playerNames.map((n) => scoreMap.get(n) ?? 0);
-        const normed = normalize(scores);
+        const normed = normalize(scores, baseSystems[i].maxPerGame);
         const result = new Map<string, number>();
-        playerNames.forEach((n, i) => result.set(n, normed[i]));
+        playerNames.forEach((n, j) => result.set(n, normed[j]));
         return result;
       });
 

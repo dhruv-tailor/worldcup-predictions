@@ -6,6 +6,7 @@ import CategoryBreakdown from './components/CategoryBreakdown'
 import GameCard from './components/GameCard'
 import ScoringSelector from './components/ScoringSelector'
 import ScoreChart from './components/ScoreChart'
+import UpcomingGames from './components/UpcomingGames'
 import './App.css'
 
 /**
@@ -77,6 +78,10 @@ function App() {
             standings={standings}
             games={games}
             system={selectedSystem}
+          />
+          <UpcomingGames
+            games={games}
+            predictions={predictions}
           />
         </>
       )}

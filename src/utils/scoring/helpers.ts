@@ -67,10 +67,6 @@ export function simpleScoring(
 /**
  * Computes a Ted Classic raw score for a single prediction.
  *
- * This is extracted as a shared helper because both the Ladder (ELO)
- * and Hot Streak systems use Ted Classic scoring as their base measure
- * for comparing prediction quality.
- *
  * Scoring: +2 correct winner, +1 correct goal difference, +1 exact score = max 4
  *
  * @param game - The game with actual scores (must be played)
@@ -89,6 +85,41 @@ export function tedClassicRawScore(game: Game, prediction: Prediction): number {
   }
   if (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) {
     pts += 1;
+  }
+  return pts;
+}
+
+/**
+ * Computes a Ted+ raw score for a single prediction.
+ *
+ * This is extracted as a shared helper because both the Ladder (ELO)
+ * and Hot Streak systems use Ted+ scoring as their base measure
+ * for comparing prediction quality.
+ *
+ * Scoring: +2 correct winner (+3 for draw), +1 correct GD,
+ *          +1 correct total goals, +2 exact score = max 7
+ *
+ * @param game - The game with actual scores (must be played)
+ * @param prediction - The player's predicted scores
+ * @returns Raw point total (0–7)
+ */
+export function tedPlusRawScore(game: Game, prediction: Prediction): number {
+  if (game.homeScore === null || game.awayScore === null) return 0;
+
+  let pts = 0;
+  const actualWinner = getWinner(game.homeScore, game.awayScore);
+  const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+  if (actualWinner === predictedWinner) {
+    pts += actualWinner === 'draw' ? 3 : 2;
+  }
+  if ((game.homeScore - game.awayScore) === (prediction.homeScore - prediction.awayScore)) {
+    pts += 1;
+  }
+  if ((game.homeScore + game.awayScore) === (prediction.homeScore + prediction.awayScore)) {
+    pts += 1;
+  }
+  if (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) {
+    pts += 2;
   }
   return pts;
 }

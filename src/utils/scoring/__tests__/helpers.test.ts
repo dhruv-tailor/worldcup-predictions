@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWinner, tedClassicRawScore } from '../helpers';
+import { getWinner, tedClassicRawScore, tedPlusRawScore } from '../helpers';
 import type { Game, Prediction } from '../../../types';
 
 describe('getWinner', () => {
@@ -47,5 +47,39 @@ describe('tedClassicRawScore', () => {
     const unplayed: Game = { id: 2, home: 'A', away: 'B', homeScore: null, awayScore: null };
     const pred: Prediction = { name: 'P', gameId: 2, homeScore: 1, awayScore: 0 };
     expect(tedClassicRawScore(unplayed, pred)).toBe(0);
+  });
+});
+
+describe('tedPlusRawScore', () => {
+  const game: Game = { id: 1, home: 'A', away: 'B', homeScore: 2, awayScore: 1 };
+
+  it('returns 6 for exact score (non-draw)', () => {
+    const pred: Prediction = { name: 'P', gameId: 1, homeScore: 2, awayScore: 1 };
+    // winner(2) + GD(1) + totalGoals(1) + exact(2) = 6
+    expect(tedPlusRawScore(game, pred)).toBe(6);
+  });
+
+  it('returns 7 for exact draw prediction', () => {
+    const drawGame: Game = { id: 2, home: 'A', away: 'B', homeScore: 1, awayScore: 1 };
+    const pred: Prediction = { name: 'P', gameId: 2, homeScore: 1, awayScore: 1 };
+    // winner(3 for draw) + GD(1) + totalGoals(1) + exact(2) = 7
+    expect(tedPlusRawScore(drawGame, pred)).toBe(7);
+  });
+
+  it('returns 3 for correct winner + correct GD only', () => {
+    const pred: Prediction = { name: 'P', gameId: 1, homeScore: 3, awayScore: 2 };
+    // winner(2) + GD(1) + totalGoals(3 vs 5, 0) + exact(0) = 3
+    expect(tedPlusRawScore(game, pred)).toBe(3);
+  });
+
+  it('returns 0 for wrong winner', () => {
+    const pred: Prediction = { name: 'P', gameId: 1, homeScore: 0, awayScore: 1 };
+    expect(tedPlusRawScore(game, pred)).toBe(0);
+  });
+
+  it('returns 0 for unplayed game', () => {
+    const unplayed: Game = { id: 2, home: 'A', away: 'B', homeScore: null, awayScore: null };
+    const pred: Prediction = { name: 'P', gameId: 2, homeScore: 1, awayScore: 0 };
+    expect(tedPlusRawScore(unplayed, pred)).toBe(0);
   });
 });
