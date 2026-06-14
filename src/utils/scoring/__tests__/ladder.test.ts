@@ -65,7 +65,6 @@ describe('Ladder (ELO)', () => {
     ];
     const standings = ladder.calculateStandings(games, predictions);
 
-    const alice = standings.find((s) => s.name === 'Alice')!;
     const bob = standings.find((s) => s.name === 'Bob')!;
 
     // Game 1: Both predict exact → draw → ELO stays 1000

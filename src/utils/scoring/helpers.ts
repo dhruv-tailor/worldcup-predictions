@@ -7,7 +7,7 @@
  * @module scoring/helpers
  */
 
-import type { Game, Prediction, PointBreakdown, PlayerScore, GameBreakdown } from '../types';
+import type { Game, Prediction, PointBreakdown, PlayerScore, GameBreakdown } from '../../types';
 
 /**
  * Determines the match outcome from a pair of scores.
