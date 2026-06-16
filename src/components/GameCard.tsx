@@ -1,23 +1,18 @@
+import { Link } from 'react-router';
 import type { Game, PlayerScore, ScoringSystem } from '../types';
 import { getGameLabel } from '../utils/flags';
 
 interface GameCardProps {
-  /** The game to show details for */
   game: Game;
-  /** All games (for prev/next navigation) */
   games: Game[];
-  /** Full standings (used to extract per-game breakdowns for each player) */
   standings: PlayerScore[];
-  /** The currently active scoring system (drives dynamic column rendering) */
   system: ScoringSystem;
-  /** Callback to return to the leaderboard view */
-  onClose: () => void;
-  /** Callback to navigate to a different game */
-  onSelectGame: (gameId: number) => void;
 }
 
-export default function GameCard({ game, games, standings, system, onClose, onSelectGame }: GameCardProps) {
+export default function GameCard({ game, games, standings, system }: GameCardProps) {
   const isPlayed = game.homeScore !== null && game.awayScore !== null;
+  const isHomeWinner = isPlayed && game.homeScore! > game.awayScore!;
+  const isAwayWinner = isPlayed && game.awayScore! > game.homeScore!;
   const playedGames = games.filter((g) => g.homeScore !== null).sort((a, b) => a.id - b.id);
   const currentIdx = playedGames.findIndex((g) => g.id === game.id);
   const prevGame = currentIdx > 0 ? playedGames[currentIdx - 1] : null;
@@ -36,31 +31,31 @@ export default function GameCard({ game, games, standings, system, onClose, onSe
     <div className="game-card">
       <div className="game-card-header">
         <div className="game-card-nav">
-          <button className="back-btn" onClick={onClose}>← Back</button>
+          <Link to="/" className="back-btn">← Back</Link>
           <div className="game-card-nav-spacer" />
-          <button
-            className="nav-btn"
-            onClick={() => prevGame && onSelectGame(prevGame.id)}
-            disabled={!prevGame}
-            aria-label="Previous game"
-          >
-            ← Prev
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => nextGame && onSelectGame(nextGame.id)}
-            disabled={!nextGame}
-            aria-label="Next game"
-          >
-            Next →
-          </button>
+          {prevGame ? (
+            <Link to={`/game/${prevGame.id}`} className="nav-btn" aria-label="Previous game">← Prev</Link>
+          ) : (
+            <span className="nav-btn disabled" aria-disabled="true">← Prev</span>
+          )}
+          {nextGame ? (
+            <Link to={`/game/${nextGame.id}`} className="nav-btn" aria-label="Next game">Next →</Link>
+          ) : (
+            <span className="nav-btn disabled" aria-disabled="true">Next →</span>
+          )}
         </div>
         <h2>
           {getGameLabel(game)}
         </h2>
         {isPlayed ? (
-          <div className="actual-score">
-            Final: {game.home} {game.homeScore}{game.homeScore! > game.awayScore! ? ' 🏆' : ''} – {game.awayScore! > game.homeScore! ? '🏆 ' : ''}{game.awayScore} {game.away}
+          <div className="actual-score final-scoreline">
+            <span className={`final-team ${isHomeWinner ? 'winner-team' : ''}`}>
+              {game.home} {game.homeScore}{isHomeWinner ? ' 🏆' : ''}
+            </span>
+            <span className="final-sep"> – </span>
+            <span className={`final-team ${isAwayWinner ? 'winner-team' : ''}`}>
+              {isAwayWinner ? '🏆 ' : ''}{game.awayScore} {game.away}
+            </span>
           </div>
         ) : (
           <div className="actual-score pending">Not yet played</div>
@@ -88,6 +83,9 @@ export default function GameCard({ game, games, standings, system, onClose, onSe
               <td>{p!.name}</td>
               <td>
                 {p!.prediction.homeScore} – {p!.prediction.awayScore}
+                {isPlayed && p!.prediction.homeScore === game.homeScore && p!.prediction.awayScore === game.awayScore && (
+                  <span className="exact-hit-badge">🎯 EXACT!</span>
+                )}
               </td>
               {isPlayed && (
                 <>

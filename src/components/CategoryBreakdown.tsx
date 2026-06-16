@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { toPng } from 'html-to-image';
 import type { Game, Prediction } from '../types';
 import { scoringSystems } from '../utils/scoring';
 
@@ -24,17 +23,19 @@ export default function CategoryBreakdown({ games, predictions }: CategoryBreakd
   );
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const handleExport = useCallback(() => {
+  const handleExport = useCallback(async () => {
     if (!gridRef.current || isExporting) return;
     setIsExporting(true);
-    toPng(gridRef.current, { backgroundColor: '#1a1a2e', pixelRatio: 4 })
-      .then((dataUrl) => {
-        const link = document.createElement('a');
-        link.download = `leaderboards-game${lastGameId}.png`;
-        link.href = dataUrl;
-        link.click();
-      })
-      .finally(() => setIsExporting(false));
+    try {
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(gridRef.current, { backgroundColor: '#1a1a2e', pixelRatio: 4 });
+      const link = document.createElement('a');
+      link.download = `leaderboards-game${lastGameId}.png`;
+      link.href = dataUrl;
+      link.click();
+    } finally {
+      setIsExporting(false);
+    }
   }, [lastGameId, isExporting]);
 
   return (
@@ -66,9 +67,10 @@ export default function CategoryBreakdown({ games, predictions }: CategoryBreakd
                   {sorted.map((player, i) => {
                     const lastBd = player.gameBreakdowns.find((gb) => gb.gameId === lastGameId);
                     const delta = lastBd?.points.total ?? 0;
+                    const rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
                     return (
                       <tr key={player.name}>
-                        <td className="rank-col">{i + 1}</td>
+                        <td className="rank-col">{rankLabel}</td>
                         <td className="name-col">{player.name}</td>
                         <td className="total-col">{player.totalPoints}</td>
                         <td className={`delta-col ${delta > 0 ? 'delta-pos' : delta < 0 ? 'delta-neg' : ''}`}>

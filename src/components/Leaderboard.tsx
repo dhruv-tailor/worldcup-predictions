@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import type { PlayerScore, Game, ScoringSystem } from '../types';
 import { getGameLabelShort } from '../utils/flags';
 
@@ -6,30 +8,13 @@ type SortKey = 'rank' | 'total' | 'delta' | `game-${number}`;
 type SortDir = 'asc' | 'desc';
 
 interface LeaderboardProps {
-  /** Sorted player standings from the active scoring system */
   standings: PlayerScore[];
-  /** All games (played and unplayed) */
   games: Game[];
-  /** The currently active scoring system (used for color scaling and formatting) */
   system: ScoringSystem;
-  /** Callback when a game column header is clicked to view game details */
-  onSelectGame: (gameId: number) => void;
 }
 
-/**
- * Main leaderboard table showing ranked player standings.
- *
- * Displays one row per player, sorted by total points (descending).
- * Columns include rank, player name, per-game points for each played game,
- * and the overall total. Game column headers are clickable to navigate
- * to the detailed {@link GameCard} view.
- *
- * Point cells are color-coded using the active system's `maxPerGame`
- * to scale thresholds (perfect, great, good, ok, zero).
- *
- * For the Ladder (ELO) system, per-game values are displayed with +/− signs.
- */
-export default function Leaderboard({ standings, games, system, onSelectGame }: LeaderboardProps) {
+export default function Leaderboard({ standings, games, system }: LeaderboardProps) {
+  const navigate = useNavigate();
   const playedGames = games.filter((g) => g.homeScore !== null).sort((a, b) => a.id - b.id);
   const sysName = system.name;
   const lastGameId = playedGames.length > 0 ? playedGames[playedGames.length - 1].id : null;
@@ -169,7 +154,7 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
               <th
                 key={game.id}
                 className={`game-col clickable sortable ${sortKey === `game-${game.id}` ? 'sorted' : ''}`}
-                onClick={() => onSelectGame(game.id)}
+                onClick={() => navigate(`/game/${game.id}`)}
                 title={`${game.home} vs ${game.away}`}
                 aria-label={`${game.home} vs ${game.away}, Game ${game.id}`}
               >
@@ -183,14 +168,23 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
             const rank = standings.indexOf(player) + 1;
             const isHighlighted = highlightedPlayers.size > 0 && highlightedPlayers.has(player.name);
             const isDimmed = highlightedPlayers.size > 0 && !highlightedPlayers.has(player.name);
+            const rankLabel = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
             return (
               <tr
                 key={player.name}
                 className={isHighlighted ? 'row-highlighted' : isDimmed ? 'row-dimmed' : ''}
                 onClick={() => toggleHighlight(player.name)}
               >
-                <td className="rank-col">{rank}</td>
-                <td className="name-col">{player.name}</td>
+                <td className="rank-col">{rank === 1 ? `👑 ${rankLabel}` : rankLabel}</td>
+                <td className="name-col">
+                  <Link
+                    to={`/player/${encodeURIComponent(player.name)}`}
+                    className="inline-link"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {player.name}
+                  </Link>
+                </td>
                 <td className="total-col">{player.totalPoints}</td>
                 {lastGameId != null && (() => {
                   const lastBreakdown = player.gameBreakdowns.find((gb) => gb.gameId === lastGameId);
@@ -211,10 +205,10 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
                 {sysName === 'Ladder' && <td className="stat-col">{player.peakRating ?? '-'}</td>}
                 {sysName === 'Ladder' && <td className="stat-col">{player.lowestRating ?? '-'}</td>}
                 {sysName === 'Hot Streak' && (
-                  <td className="streak-col">{player.currentStreak ? `${player.currentStreak}` : '-'}</td>
+                  <td className="streak-col">{player.currentStreak ? `${player.currentStreak} ${streakFlames(player.currentStreak)}` : '-'}</td>
                 )}
                 {sysName === 'Hot Streak' && (
-                  <td className="streak-col">{player.longestStreak ? `${player.longestStreak}` : '-'}</td>
+                  <td className="streak-col">{player.longestStreak ? `${player.longestStreak} ${streakFlames(player.longestStreak)}` : '-'}</td>
                 )}
                 {sysName === 'Participation Trophy' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
                 {sysName === 'Participation Trophy' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
@@ -271,4 +265,11 @@ function pointsClass(points: number, max?: number): string {
   if (points >= m * 0.5) return 'pts-good';
   if (points >= 1) return 'pts-ok';
   return 'pts-zero';
+}
+
+function streakFlames(streak: number): string {
+  if (streak >= 6) return '🔥🔥🔥';
+  if (streak >= 4) return '🔥🔥';
+  if (streak >= 2) return '🔥';
+  return '';
 }

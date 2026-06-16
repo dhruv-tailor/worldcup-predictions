@@ -15,8 +15,6 @@ import {
   Line,
   BarChart,
   Bar,
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -24,6 +22,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import type { TooltipProps } from 'recharts';
 import type { PlayerScore, Game, ScoringSystem } from '../types';
 import { getGameLabelShort } from '../utils/flags';
 
@@ -36,7 +35,7 @@ interface ScoreChartProps {
   system: ScoringSystem;
 }
 
-type ChartType = 'line' | 'bar' | 'area';
+type ChartType = 'line' | 'bar';
 
 /** Fixed color palette for up to 12 players */
 const COLORS = [
@@ -112,7 +111,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
     fontSize: 13,
   };
 
-  const labelFormatter = (label: string, payload: Array<{ payload?: { gameLabel?: string } }>) => {
+  const labelFormatter: NonNullable<TooltipProps['labelFormatter']> = (label, payload) => {
     const item = payload?.[0]?.payload;
     return item?.gameLabel ? `${label}: ${item.gameLabel}` : label;
   };
@@ -142,29 +141,10 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
       return (
         <BarChart {...commonProps}>
           {grid}{xAxis}{yAxis}{tooltip}{legend}
-          {visiblePlayers.map((name, i) => (
+          {visiblePlayers.map((name) => (
             <Bar key={name} dataKey={name} fill={COLORS[playerNames.indexOf(name) % COLORS.length]} opacity={0.85} />
           ))}
         </BarChart>
-      );
-    }
-
-    if (chartType === 'area') {
-      return (
-        <AreaChart {...commonProps}>
-          {grid}{xAxis}{yAxis}{tooltip}{legend}
-          {visiblePlayers.map((name, i) => (
-            <Area
-              key={name}
-              type="monotone"
-              dataKey={name}
-              stroke={COLORS[playerNames.indexOf(name) % COLORS.length]}
-              fill={COLORS[playerNames.indexOf(name) % COLORS.length]}
-              fillOpacity={0.15}
-              strokeWidth={2}
-            />
-          ))}
-        </AreaChart>
       );
     }
 
@@ -197,7 +177,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
               className={`chart-type-btn ${chartType === t ? 'active' : ''}`}
               onClick={() => setChartType(t)}
             >
-              {t === 'line' ? '📈 Line' : t === 'area' ? '📊 Area' : '📶 Bar'}
+              {t === 'line' ? '📈 Line' : '📶 Bar'}
             </button>
           ))}
         </div>
