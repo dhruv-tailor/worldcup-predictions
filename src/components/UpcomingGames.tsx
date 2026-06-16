@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Game, Prediction } from '../types';
 import { getFlag, getGameLabel } from '../utils/flags';
 
@@ -13,6 +14,8 @@ interface UpcomingGamesProps {
  * Each game is rendered as a mini card with every player's predicted score.
  */
 export default function UpcomingGames({ games, predictions }: UpcomingGamesProps) {
+  const [showAll, setShowAll] = useState(false);
+
   // Find unplayed games that have predictions
   const upcomingGames = games
     .filter((g) => g.homeScore === null)
@@ -20,6 +23,8 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
     .sort((a, b) => a.id - b.id);
 
   if (upcomingGames.length === 0) return null;
+
+  const displayGames = showAll ? upcomingGames : upcomingGames.slice(0, 4);
 
   // Group predictions by game for quick lookup
   const predsByGame = new Map<number, Prediction[]>();
@@ -31,9 +36,22 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
 
   return (
     <div className="upcoming-games">
-      <h3>🔮 Upcoming Predictions</h3>
+      <div className="upcoming-header">
+        <h3>🔮 Upcoming Predictions</h3>
+        {upcomingGames.length > 4 && (
+          <select
+            className="upcoming-filter-select"
+            value={showAll ? 'all' : 'next4'}
+            onChange={(e) => setShowAll(e.target.value === 'all')}
+            aria-label="Filter upcoming games"
+          >
+            <option value="next4">Next 4 Games</option>
+            <option value="all">All ({upcomingGames.length})</option>
+          </select>
+        )}
+      </div>
       <div className="upcoming-grid">
-        {upcomingGames.map((game) => {
+        {displayGames.map((game) => {
           const gamePreds = (predsByGame.get(game.id) ?? []).sort((a, b) =>
             a.name.localeCompare(b.name)
           );

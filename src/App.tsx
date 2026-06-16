@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { parseGames, parsePredictions } from './utils/parseData'
 import { scoringSystems } from './utils/scoring'
 import Leaderboard from './components/Leaderboard'
@@ -9,25 +9,20 @@ import ScoreChart from './components/ScoreChart'
 import UpcomingGames from './components/UpcomingGames'
 import './App.css'
 
-/**
- * Root application component for the World Cup Predictions calculator.
- *
- * Manages the top-level state:
- * - Which scoring system is active (from the dropdown)
- * - Which game is selected for detail view (or null for leaderboard)
- *
- * Data flow:
- * 1. CSVs are parsed once on mount via `useMemo` → `games[]` and `predictions[]`
- * 2. Standings are recalculated whenever the scoring system changes
- * 3. The active system's `calculateStandings` method handles all scoring logic
- * 4. Either the Leaderboard or GameCard is rendered based on selection state
- */
 function App() {
   const games = useMemo(() => parseGames(), [])
   const predictions = useMemo(() => parsePredictions(), [])
 
   const [selectedSystem, setSelectedSystem] = useState(scoringSystems[0])
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const standings = useMemo(
     () => selectedSystem.calculateStandings(games, predictions),
@@ -47,6 +42,14 @@ function App() {
         <p className="subtitle">
           {playedCount} of {games.length} games played
         </p>
+        <button
+          className="theme-toggle"
+          onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </header>
 
       <ScoringSelector
@@ -58,9 +61,11 @@ function App() {
       {selectedGame ? (
         <GameCard
           game={selectedGame}
+          games={games}
           standings={standings}
           system={selectedSystem}
           onClose={() => setSelectedGameId(null)}
+          onSelectGame={setSelectedGameId}
         />
       ) : (
         <>

@@ -9,10 +9,14 @@
  * so colors remain consistent when switching scoring systems.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -32,6 +36,8 @@ interface ScoreChartProps {
   system: ScoringSystem;
 }
 
+type ChartType = 'line' | 'bar' | 'area';
+
 /** Fixed color palette for up to 12 players */
 const COLORS = [
   '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe',
@@ -41,6 +47,8 @@ const COLORS = [
 
 export default function ScoreChart({ standings, games, system }: ScoreChartProps) {
   const isElo = system.name === 'Ladder';
+  const [chartType, setChartType] = useState<ChartType>('line');
+  const [hiddenPlayers, setHiddenPlayers] = useState<Set<string>>(new Set());
 
   const { chartData, playerNames } = useMemo(() => {
     const playedGames = games
@@ -86,45 +94,128 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
     return <div className="score-chart empty">No games played yet</div>;
   }
 
-  return (
-    <div className="score-chart">
-      <h3>{isElo ? 'ELO Rating Over Time' : 'Cumulative Score Over Time'}</h3>
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-          <XAxis
-            dataKey="game"
-            tick={{ fontSize: 12, fill: 'var(--text)' }}
-          />
-          <YAxis
-            tick={{ fontSize: 12, fill: 'var(--text)' }}
-            domain={isElo ? ['dataMin - 10', 'dataMax + 10'] : [0, 'auto']}
-          />
-          <Tooltip
-            contentStyle={{
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 6,
-              fontSize: 13,
-            }}
-            labelFormatter={(label, payload) => {
-              const item = payload?.[0]?.payload;
-              return item?.gameLabel ? `${label}: ${item.gameLabel}` : label;
-            }}
-          />
-          <Legend wrapperStyle={{ fontSize: 13 }} />
-          {playerNames.map((name, i) => (
-            <Line
+  const togglePlayer = (name: string) => {
+    setHiddenPlayers((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const visiblePlayers = playerNames.filter((n) => !hiddenPlayers.has(n));
+
+  const tooltipStyle = {
+    background: 'var(--bg)',
+    border: '1px solid var(--border)',
+    borderRadius: 6,
+    fontSize: 13,
+  };
+
+  const labelFormatter = (label: string, payload: Array<{ payload?: { gameLabel?: string } }>) => {
+    const item = payload?.[0]?.payload;
+    return item?.gameLabel ? `${label}: ${item.gameLabel}` : label;
+  };
+
+  const renderChart = () => {
+    const commonProps = {
+      data: chartData,
+      margin: { top: 5, right: 20, bottom: 5, left: 0 },
+    };
+
+    const xAxis = (
+      <XAxis dataKey="game" tick={{ fontSize: 12, fill: 'var(--text)' }} />
+    );
+    const yAxis = (
+      <YAxis
+        tick={{ fontSize: 12, fill: 'var(--text)' }}
+        domain={isElo ? ['dataMin - 10', 'dataMax + 10'] : [0, 'auto']}
+      />
+    );
+    const grid = <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />;
+    const tooltip = (
+      <Tooltip contentStyle={tooltipStyle} labelFormatter={labelFormatter} />
+    );
+    const legend = <Legend wrapperStyle={{ fontSize: 13 }} />;
+
+    if (chartType === 'bar') {
+      return (
+        <BarChart {...commonProps}>
+          {grid}{xAxis}{yAxis}{tooltip}{legend}
+          {visiblePlayers.map((name, i) => (
+            <Bar key={name} dataKey={name} fill={COLORS[playerNames.indexOf(name) % COLORS.length]} opacity={0.85} />
+          ))}
+        </BarChart>
+      );
+    }
+
+    if (chartType === 'area') {
+      return (
+        <AreaChart {...commonProps}>
+          {grid}{xAxis}{yAxis}{tooltip}{legend}
+          {visiblePlayers.map((name, i) => (
+            <Area
               key={name}
               type="monotone"
               dataKey={name}
-              stroke={COLORS[i % COLORS.length]}
+              stroke={COLORS[playerNames.indexOf(name) % COLORS.length]}
+              fill={COLORS[playerNames.indexOf(name) % COLORS.length]}
+              fillOpacity={0.15}
               strokeWidth={2}
-              dot={{ r: 3 }}
-              activeDot={{ r: 5 }}
             />
           ))}
-        </LineChart>
+        </AreaChart>
+      );
+    }
+
+    return (
+      <LineChart {...commonProps}>
+        {grid}{xAxis}{yAxis}{tooltip}{legend}
+        {visiblePlayers.map((name) => (
+          <Line
+            key={name}
+            type="monotone"
+            dataKey={name}
+            stroke={COLORS[playerNames.indexOf(name) % COLORS.length]}
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            activeDot={{ r: 5 }}
+          />
+        ))}
+      </LineChart>
+    );
+  };
+
+  return (
+    <div className="score-chart">
+      <div className="score-chart-header">
+        <h3>{isElo ? 'ELO Rating Over Time' : 'Cumulative Score Over Time'}</h3>
+        <div className="chart-controls">
+          {(['line', 'area', 'bar'] as ChartType[]).map((t) => (
+            <button
+              key={t}
+              className={`chart-type-btn ${chartType === t ? 'active' : ''}`}
+              onClick={() => setChartType(t)}
+            >
+              {t === 'line' ? '📈 Line' : t === 'area' ? '📊 Area' : '📶 Bar'}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="player-toggles">
+        {playerNames.map((name) => (
+          <button
+            key={name}
+            className={`player-toggle-btn ${hiddenPlayers.has(name) ? 'hidden-player' : ''}`}
+            style={{ borderColor: COLORS[playerNames.indexOf(name) % COLORS.length], color: COLORS[playerNames.indexOf(name) % COLORS.length] }}
+            onClick={() => togglePlayer(name)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+      <ResponsiveContainer width="100%" height={350}>
+        {renderChart()}
       </ResponsiveContainer>
     </div>
   );

@@ -1,5 +1,6 @@
-:root {
-  --text: #9ca3af;
+:root,
+[data-theme="dark"] {
+  --text: #b0b8c4;
   --text-h: #f3f4f6;
   --bg: #16171d;
   --border: #2e303a;
@@ -28,6 +29,24 @@
   @media (max-width: 1024px) {
     font-size: 16px;
   }
+}
+
+[data-theme="light"] {
+  --text: #4b5563;
+  --text-h: #111827;
+  --bg: #f9fafb;
+  --border: #e5e7eb;
+  --code-bg: #f3f4f6;
+  --accent: #7c3aed;
+  --accent-bg: rgba(124, 58, 237, 0.1);
+  --accent-border: rgba(124, 58, 237, 0.4);
+  --social-bg: rgba(229, 231, 235, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
 }
 
 #root {

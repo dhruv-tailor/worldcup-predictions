@@ -4,27 +4,24 @@ import { getGameLabel } from '../utils/flags';
 interface GameCardProps {
   /** The game to show details for */
   game: Game;
+  /** All games (for prev/next navigation) */
+  games: Game[];
   /** Full standings (used to extract per-game breakdowns for each player) */
   standings: PlayerScore[];
   /** The currently active scoring system (drives dynamic column rendering) */
   system: ScoringSystem;
   /** Callback to return to the leaderboard view */
   onClose: () => void;
+  /** Callback to navigate to a different game */
+  onSelectGame: (gameId: number) => void;
 }
 
-/**
- * Detailed view for a single game showing all players' predictions and point breakdowns.
- *
- * Renders:
- * - Game header with teams and final score (or "Not yet played")
- * - Table of all predictions sorted by points earned (descending)
- * - Dynamic breakdown columns driven by the active scoring system's `categoryLabels`
- *
- * Column headers and values adapt automatically when switching scoring systems.
- * For example, Ted Classic shows "Winner | GD | Exact" while Gambler's shows "Base | Bonus".
- */
-export default function GameCard({ game, standings, system, onClose }: GameCardProps) {
+export default function GameCard({ game, games, standings, system, onClose, onSelectGame }: GameCardProps) {
   const isPlayed = game.homeScore !== null && game.awayScore !== null;
+  const playedGames = games.filter((g) => g.homeScore !== null).sort((a, b) => a.id - b.id);
+  const currentIdx = playedGames.findIndex((g) => g.id === game.id);
+  const prevGame = currentIdx > 0 ? playedGames[currentIdx - 1] : null;
+  const nextGame = currentIdx < playedGames.length - 1 ? playedGames[currentIdx + 1] : null;
 
   // Gather all predictions for this game, sorted by points (desc)
   const predictions = standings
@@ -38,9 +35,26 @@ export default function GameCard({ game, standings, system, onClose }: GameCardP
   return (
     <div className="game-card">
       <div className="game-card-header">
-        <button className="back-btn" onClick={onClose}>
-          ← Back
-        </button>
+        <div className="game-card-nav">
+          <button className="back-btn" onClick={onClose}>← Back</button>
+          <div className="game-card-nav-spacer" />
+          <button
+            className="nav-btn"
+            onClick={() => prevGame && onSelectGame(prevGame.id)}
+            disabled={!prevGame}
+            aria-label="Previous game"
+          >
+            ← Prev
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => nextGame && onSelectGame(nextGame.id)}
+            disabled={!nextGame}
+            aria-label="Next game"
+          >
+            Next →
+          </button>
+        </div>
         <h2>
           {getGameLabel(game)}
         </h2>
