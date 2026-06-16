@@ -11,10 +11,10 @@ id;home;away;home_score;away_score
 10;Netherlands;Japan;2;2
 11;Ivory Coast;Ecuador;1;0
 12;Sweden;Tunisia;5;1
-13;Spain;Cabo Verde;;
-14;Belgium;Egypt;;
-15;Saudi Arabia;Uruguay;;
-16;Iran;New Zealand;;
+13;Spain;Cabo Verde;0;0
+14;Belgium;Egypt;1;1
+15;Saudi Arabia;Uruguay;1;1
+16;Iran;New Zealand;2;2
 17;France;Senegal;;
 18;Iraq;Norway;;
 19;Argentina;Algeria;;

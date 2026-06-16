@@ -45,8 +45,7 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
             {sysName === 'Ted+' && <th className="stat-col" title="Perfect games (7 pts)">⭐</th>}
             {sysName === "Gambler's" && <th className="stat-col" title="Best multiplier">Best×</th>}
             {sysName === "Gambler's" && <th className="stat-col" title="Average multiplier">Avg×</th>}
-            {sysName === 'Black Sheep' && <th className="stat-col" title="% of games beating the crowd">Beat%</th>}
-            {sysName === 'Black Sheep' && <th className="stat-col" title="Average edge over crowd">Edge</th>}
+            {sysName === '$5 Bets' && <th className="stat-col" title="Correct winner percentage">Win%</th>}
             {sysName === 'Ladder' && <th className="stat-col" title="Peak ELO rating">Peak</th>}
             {sysName === 'Ladder' && <th className="stat-col" title="Lowest ELO rating">Low</th>}
             {sysName === 'Hot Streak' && <th className="streak-col" title="Current streak">🔥</th>}
@@ -88,8 +87,7 @@ export default function Leaderboard({ standings, games, system, onSelectGame }: 
               {sysName === 'Ted+' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
               {sysName === "Gambler's" && <td className="stat-col">{player.bestMultiplier ? `×${player.bestMultiplier}` : '-'}</td>}
               {sysName === "Gambler's" && <td className="stat-col">{player.avgMultiplier ? `×${player.avgMultiplier}` : '-'}</td>}
-              {sysName === 'Black Sheep' && <td className="stat-col">{player.crowdBeatPct != null ? `${player.crowdBeatPct}%` : '-'}</td>}
-              {sysName === 'Black Sheep' && <td className="stat-col">{player.avgEdge != null ? `${player.avgEdge}` : '-'}</td>}
+              {sysName === '$5 Bets' && <td className="stat-col">{player.winnerPct != null ? `${player.winnerPct}%` : '-'}</td>}
               {sysName === 'Ladder' && <td className="stat-col">{player.peakRating ?? '-'}</td>}
               {sysName === 'Ladder' && <td className="stat-col">{player.lowestRating ?? '-'}</td>}
               {sysName === 'Hot Streak' && (

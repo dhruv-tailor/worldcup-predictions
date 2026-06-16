@@ -20,13 +20,13 @@ import type { Game, Prediction, ScoringSystem, PlayerScore, GameBreakdown } from
 import tedClassic from './tedClassic';
 import tedPlus from './tedPlus';
 import gamblers from './gamblers';
-import blackSheep from './blackSheep';
+import fiveDollarBets from './fiveDollarBets';
 import ladder from './ladder';
 import hotStreak from './hotStreak';
 import participationTrophy from './participationTrophy';
 
 /** Base scoring systems to aggregate */
-const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, blackSheep, ladder, hotStreak, participationTrophy];
+const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, fiveDollarBets, ladder, hotStreak, participationTrophy];
 
 /** Short labels for per-game breakdown columns */
 const systemLabels: { key: string; label: string }[] = [
