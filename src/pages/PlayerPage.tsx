@@ -1,5 +1,5 @@
 import { Navigate, useNavigate, useParams } from 'react-router';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { scoringSystems } from '../utils/scoring';
 import PlayerProfile from '../components/PlayerProfile';
 

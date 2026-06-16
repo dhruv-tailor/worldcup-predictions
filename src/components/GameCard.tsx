@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 import { Link } from 'react-router';
 import type { Game, PlayerScore, ScoringSystem } from '../types';
 import { getFlag, getGameLabel } from '../utils/flags';
+import { createBarcodePattern } from '../utils/barcode';
 
 interface GameCardProps {
   game: Game;
@@ -57,7 +58,7 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
     if (!target) return;
 
     const { toPng } = await import('html-to-image');
-    const dataUrl = await toPng(target, { backgroundColor: '#f5f1e7', pixelRatio: 3 });
+    const dataUrl = await toPng(target, { backgroundColor: '#f5f1e7', pixelRatio: 4 });
     const safeName = playerName.toLowerCase().replace(/\s+/g, '-');
     const link = document.createElement('a');
     link.download = `print-ticket-match-${game.id}-${safeName}.png`;
@@ -124,6 +125,7 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
               ref={(el) => {
                 ticketRefs.current[ticketKey] = el;
               }}
+              style={{ ['--barcode-pattern' as string]: createBarcodePattern(`${game.id}:${game.home}:${game.away}`, { variant: 'detail' }) }}
             >
               <span className="ticket-corner-fold" aria-hidden="true" />
               <div className="ticket-top-band">
@@ -179,7 +181,7 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
               )}
 
               <div className="ticket-footer-note">
-                <span>{isPlayed ? 'Validated Result Slip' : 'Pending Result Validation'}</span>
+                <span>{isPlayed ? 'Entry Pass' : 'Entry Pass'}</span>
                 {isPlayed && isExact && <span className="ticket-status-stamp ticket-status-hit">Top Hit</span>}
                 <button
                   className="ticket-print-btn"

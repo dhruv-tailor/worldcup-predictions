@@ -1,4 +1,4 @@
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import Leaderboard from '../components/Leaderboard';
 import ScoreChart from '../components/ScoreChart';
 

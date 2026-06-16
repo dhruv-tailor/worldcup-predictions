@@ -1,20 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { parseGames, parsePredictions } from '../utils/parseData';
 import { scoringSystems } from '../utils/scoring';
-import type { Game, Prediction, PlayerScore, ScoringSystem } from '../types';
-
-interface AppContextValue {
-  games: Game[];
-  predictions: Prediction[];
-  selectedSystem: ScoringSystem;
-  setSelectedSystem: (system: ScoringSystem) => void;
-  standings: PlayerScore[];
-  theme: 'dark' | 'light';
-  setTheme: (theme: 'dark' | 'light') => void;
-}
-
-const AppContext = createContext<AppContextValue | null>(null);
+import { AppContext } from './appContextStore';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const games = useMemo(() => parseGames(), []);
@@ -48,10 +36,4 @@ export function AppProvider({ children }: { children: ReactNode }) {
       {children}
     </AppContext>
   );
-}
-
-export function useAppContext() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error('useAppContext must be used within AppProvider');
-  return ctx;
 }

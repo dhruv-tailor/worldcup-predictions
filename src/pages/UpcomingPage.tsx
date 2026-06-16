@@ -1,4 +1,4 @@
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import UpcomingGames from '../components/UpcomingGames';
 
 export default function UpcomingPage() {

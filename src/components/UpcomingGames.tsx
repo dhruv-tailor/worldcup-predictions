@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { Game, Prediction } from '../types';
 import { getFlag } from '../utils/flags';
+import { createBarcodePattern } from '../utils/barcode';
 
 interface UpcomingGamesProps {
   games: Game[];
@@ -33,7 +34,7 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
     if (!target) return;
 
     const { toPng } = await import('html-to-image');
-    const dataUrl = await toPng(target, { backgroundColor: '#f5f1e7', pixelRatio: 3 });
+    const dataUrl = await toPng(target, { backgroundColor: '#f5f1e7', pixelRatio: 4 });
     const link = document.createElement('a');
     link.download = `print-ticket-match-${game.id}.png`;
     link.href = dataUrl;
@@ -90,6 +91,7 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
               ref={(el) => {
                 ticketRefs.current[game.id] = el;
               }}
+              style={{ ['--barcode-pattern' as string]: createBarcodePattern(`${game.id}:${game.home}:${game.away}`, { variant: 'upcoming' }) }}
             >
               <span className="ticket-corner-fold" aria-hidden="true" />
               <div className="ticket-top-band">
@@ -144,7 +146,7 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
                 </div>
               </div>
               <div className="ticket-footer-note">
-                <span>Prediction Boarding Pass</span>
+                <span>Entry Pass</span>
                 <button
                   className="ticket-print-btn"
                   type="button"

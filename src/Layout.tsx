@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
-import { useAppContext } from './context/AppContext';
+import { useAppContext } from './context/useAppContext';
 import { scoringSystems } from './utils/scoring';
 import ScoringSelector from './components/ScoringSelector';
 import './App.css';

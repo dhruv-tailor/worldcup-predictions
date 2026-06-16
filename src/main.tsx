@@ -1,5 +1,6 @@
+/* @refresh skip */
 import { StrictMode, lazy } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { AppProvider } from './context/AppContext'
 import Layout from './Layout'
@@ -10,12 +11,6 @@ const GamePage = lazy(() => import('./pages/GamePage'))
 const BreakdownPage = lazy(() => import('./pages/BreakdownPage'))
 const UpcomingPage = lazy(() => import('./pages/UpcomingPage'))
 const PlayerPage = lazy(() => import('./pages/PlayerPage'))
-
-declare global {
-  interface Window {
-    __worldCupRoot?: Root
-  }
-}
 
 const router = createBrowserRouter(
   [
@@ -33,11 +28,7 @@ const router = createBrowserRouter(
   { basename: '/worldcup-predictions/' },
 )
 
-const container = document.getElementById('root')!
-const root = window.__worldCupRoot ?? createRoot(container)
-window.__worldCupRoot = root
-
-root.render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
       <RouterProvider router={router} />

@@ -824,6 +824,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
   gap: 8px;
   padding: 8px 12px;
   border-top: 1px dashed rgba(37, 50, 69, 0.3);
@@ -881,6 +882,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .ticket-print-btn:hover {
@@ -888,19 +891,13 @@
 }
 
 .ticket-barcode {
-  width: 92px;
-  height: 16px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(37, 50, 69, 0.95) 0,
-    rgba(37, 50, 69, 0.95) 2px,
-    transparent 2px,
-    transparent 4px,
-    rgba(37, 50, 69, 0.8) 4px,
-    rgba(37, 50, 69, 0.8) 5px,
-    transparent 5px,
-    transparent 8px
-  );
+  width: 150px;
+  max-width: 150px;
+  height: 18px;
+  flex: 0 0 150px;
+  background-image: var(--barcode-pattern, repeating-linear-gradient(90deg, rgba(37, 50, 69, 0.95) 0, rgba(37, 50, 69, 0.95) 2px, transparent 2px, transparent 4px));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .upcoming-card {

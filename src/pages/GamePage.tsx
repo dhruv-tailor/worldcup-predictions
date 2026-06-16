@@ -1,5 +1,5 @@
 import { useParams, Navigate } from 'react-router';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import GameCard from '../components/GameCard';
 
 export default function GamePage() {
