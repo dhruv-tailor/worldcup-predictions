@@ -9,6 +9,13 @@
   --accent-bg: rgba(245, 166, 35, 0.14);
   --accent-border: rgba(245, 166, 35, 0.5);
   --social-bg: rgba(24, 38, 52, 0.6);
+  --ticket-paper: #f5f1e7;
+  --ticket-ink: #253245;
+  --ticket-muted: #5d6a77;
+  --ticket-stamp: #bf3d2a;
+  --ticket-stroke: #d4c7ab;
+  --ticket-punch: #ebddbf;
+  --ticket-sheen: rgba(255, 255, 255, 0.55);
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 
@@ -41,6 +48,13 @@
   --accent-bg: rgba(21, 128, 61, 0.12);
   --accent-border: rgba(21, 128, 61, 0.4);
   --social-bg: rgba(212, 226, 217, 0.55);
+  --ticket-paper: #fbf7ef;
+  --ticket-ink: #293441;
+  --ticket-muted: #5f6b75;
+  --ticket-stamp: #aa2f20;
+  --ticket-stroke: #dccdb1;
+  --ticket-punch: #efe2c8;
+  --ticket-sheen: rgba(255, 255, 255, 0.62);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 

@@ -19,7 +19,8 @@
   box-sizing: border-box;
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
   position: sticky;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar::before {
@@ -153,6 +154,7 @@
   min-width: 0;
   padding: 24px;
   max-width: 1000px;
+  overflow-x: hidden;
   background:
     repeating-linear-gradient(
       0deg,
@@ -480,6 +482,10 @@
   margin: 8px 0;
 }
 
+.game-card-fixture {
+  margin: 0 0 10px;
+}
+
 .actual-score {
   font-size: 1.1rem;
   font-weight: 600;
@@ -660,43 +666,276 @@
   gap: 16px;
 }
 
+.ticket-shell {
+  position: relative;
+  background:
+    radial-gradient(circle at 88% 16%, rgba(245, 166, 35, 0.2), transparent 42%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(28, 36, 51, 0.035) 0,
+      rgba(28, 36, 51, 0.035) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    var(--ticket-paper);
+  color: var(--ticket-ink);
+  border: 1px solid var(--ticket-stroke);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.ticket-corner-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, rgba(24, 40, 59, 0.1), rgba(24, 40, 59, 0.34));
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  z-index: 2;
+}
+
+.ticket-shell::before,
+.ticket-shell::after {
+  content: '';
+  position: absolute;
+  top: 56%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ticket-punch);
+  box-shadow: inset 0 0 0 1px rgba(37, 50, 69, 0.08);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.ticket-shell::before {
+  left: -7px;
+}
+
+.ticket-shell::after {
+  right: -7px;
+}
+
+.ticket-top-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: linear-gradient(90deg, #1f3651, #2b4b6c 65%, #365b81);
+  color: #f5f7fb;
+  padding: 7px 12px;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.ticket-event {
+  font-weight: 700;
+}
+
+.ticket-serial {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+.ticket-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  color: var(--ticket-muted);
+  border-top: 1px solid rgba(37, 50, 69, 0.12);
+  border-bottom: 1px solid rgba(37, 50, 69, 0.12);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ticket-title {
+  color: var(--ticket-ink);
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  padding-bottom: 2px;
+}
+
+.ticket-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 12px 8px;
+}
+
+.ticket-chip {
+  border: 1px solid rgba(37, 50, 69, 0.22);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ticket-muted);
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.ticket-fixture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: var(--ticket-ink);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ticket-fixture-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.ticket-fixture-vs {
+  white-space: nowrap;
+}
+
+.ticket-perf {
+  height: 1px;
+  margin: 8px 12px 10px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(37, 50, 69, 0.26) 0,
+    rgba(37, 50, 69, 0.26) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+}
+
+.ticket-line-item {
+  position: relative;
+  overflow: visible;
+}
+
+.ticket-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px dashed rgba(37, 50, 69, 0.3);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ticket-muted);
+}
+
+.ticket-audit-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 12px 8px;
+  border-top: 1px solid rgba(37, 50, 69, 0.14);
+  font-size: 0.62rem;
+  color: var(--ticket-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.ticket-status-stamp {
+  border: 2px solid var(--ticket-stamp);
+  color: var(--ticket-stamp);
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(-6deg);
+  background: rgba(191, 61, 42, 0.06);
+}
+
+.ticket-status-hit {
+  border-color: #1c7a49;
+  color: #1c7a49;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.ticket-status-miss {
+  border-color: #8e2f23;
+  color: #8e2f23;
+  background: rgba(191, 61, 42, 0.12);
+}
+
+.ticket-print-btn {
+  border: 1px solid rgba(37, 50, 69, 0.35);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ticket-ink);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ticket-print-btn:hover {
+  background: rgba(37, 50, 69, 0.12);
+}
+
+.ticket-barcode {
+  width: 92px;
+  height: 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(37, 50, 69, 0.95) 0,
+    rgba(37, 50, 69, 0.95) 2px,
+    transparent 2px,
+    transparent 4px,
+    rgba(37, 50, 69, 0.8) 4px,
+    rgba(37, 50, 69, 0.8) 5px,
+    transparent 5px,
+    transparent 8px
+  );
+}
+
 .upcoming-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
 }
 
 .upcoming-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px) rotate(-0.25deg);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.23);
 }
 
 .upcoming-card-header {
   padding: 8px 12px;
-  background: var(--code-bg);
+  background: transparent;
   font-size: 1.1rem;
   text-align: center;
 }
 
 .upcoming-card-teams {
-  padding: 4px 12px 8px;
+  padding: 4px 12px 10px;
   text-align: center;
-  font-size: 0.8rem;
-  color: var(--text);
+  font-size: 0.86rem;
 }
 
 .upcoming-columns {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(37, 50, 69, 0.18);
 }
 
 .upcoming-col {
   padding: 0;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid rgba(37, 50, 69, 0.2);
 }
 
 .upcoming-col:last-child {
@@ -704,21 +943,26 @@
 }
 
 .upcoming-col-header {
-  padding: 5px 8px;
-  background: var(--code-bg);
-  color: var(--text-h);
+  padding: 6px 8px;
+  background: rgba(37, 50, 69, 0.08);
+  color: var(--ticket-ink);
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   text-align: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(37, 50, 69, 0.18);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .upcoming-pred {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 8px;
-  font-size: 0.82rem;
-  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(56px, auto);
+  column-gap: 8px;
+  align-items: start;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  border-bottom: 1px dashed rgba(37, 50, 69, 0.22);
+  color: var(--ticket-ink);
 }
 
 .upcoming-pred:last-child {
@@ -726,23 +970,182 @@
 }
 
 .upcoming-pred:hover {
-  background: var(--accent-bg);
+  background: rgba(37, 50, 69, 0.08);
 }
 
 .upcoming-player {
-  font-weight: 500;
+  font-weight: 600;
+  min-width: 0;
+  flex: 1 1 auto;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcoming-player-wrap {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .upcoming-score {
-  color: var(--text);
+  color: var(--ticket-ink);
   font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  padding-right: 0;
+  white-space: nowrap;
+  text-align: right;
+  align-self: start;
+  padding-top: 1px;
 }
 
 .upcoming-empty {
   text-align: center;
   padding: 8px;
-  color: var(--text);
+  color: var(--ticket-muted);
   font-size: 0.82rem;
+}
+
+.prediction-ticket-list {
+  display: grid;
+  gap: 14px;
+}
+
+.prediction-ticket {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.prediction-ticket-head {
+  padding: 10px 12px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prediction-ticket-kicker {
+  margin: 0 0 2px;
+  font-size: 0.64rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ticket-muted);
+}
+
+.prediction-ticket-head h4 {
+  margin: 0;
+  display: block;
+  color: var(--ticket-ink);
+  font-size: 1.06rem;
+  line-height: 1.1;
+}
+
+.prediction-ticket-meta {
+  text-align: right;
+  display: grid;
+  gap: 2px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ticket-muted);
+}
+
+.prediction-ticket-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 12px 10px;
+}
+
+.prediction-ticket-score {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ticket-ink);
+}
+
+.prediction-ticket-points {
+  padding: 0 12px 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.ticket-points-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(37, 50, 69, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.34);
+  padding: 5px 7px;
+  font-size: 0.8rem;
+}
+
+.ticket-points-label {
+  color: var(--ticket-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.65rem;
+}
+
+.ticket-points-total {
+  grid-column: -2 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(191, 61, 42, 0.35);
+  border-radius: 8px;
+  background: rgba(191, 61, 42, 0.08);
+  padding: 6px 8px;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: #843124;
+}
+
+.ticket-points-total strong {
+  font-size: 1.1rem;
+  letter-spacing: normal;
+}
+
+.prediction-ticket.ticket-exact .exact-hit-badge {
+  background: rgba(191, 61, 42, 0.12);
+  border-color: rgba(191, 61, 42, 0.5);
+  color: var(--ticket-stamp);
+}
+
+.prediction-ticket.ticket-exact .ticket-top-band {
+  background: linear-gradient(90deg, #8e2f23, #a63a2b 65%, #be4e3b);
+}
+
+.prediction-ticket.ticket-exact {
+  box-shadow: 0 0 0 1px rgba(191, 61, 42, 0.35), 0 14px 28px rgba(0, 0, 0, 0.24);
+}
+
+.prediction-ticket.ticket-hit {
+  box-shadow: 0 0 0 1px rgba(28, 122, 73, 0.26), 0 14px 28px rgba(0, 0, 0, 0.22);
+}
+
+.prediction-ticket.ticket-hit .ticket-top-band {
+  background: linear-gradient(90deg, #16613b, #1b7a49 65%, #24915a);
+}
+
+.prediction-ticket.ticket-miss {
+  box-shadow: 0 0 0 1px rgba(142, 47, 35, 0.22), 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.prediction-ticket.ticket-miss .ticket-top-band {
+  background: linear-gradient(90deg, #6a261d, #8e2f23 65%, #aa3d2e);
+}
+
+.prediction-ticket .exact-hit-badge {
+  margin-left: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* Upcoming Games Controls */
@@ -987,8 +1390,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sidebar-progress-bar::after,
-  .pts-perfect {
+  .pts-perfect,
+  .upcoming-card,
+  .prediction-ticket {
     animation: none;
+    transition: none;
   }
 }
 
@@ -1098,6 +1504,53 @@ th.sortable:focus-visible,
     grid-template-columns: 1fr;
   }
 
+  .upcoming-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-col {
+    border-right: none;
+    border-bottom: 1px solid rgba(37, 50, 69, 0.2);
+  }
+
+  .upcoming-col:last-child {
+    border-bottom: none;
+  }
+
+  .ticket-meta-row {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ticket-chip-row {
+    justify-content: center;
+  }
+
+  .ticket-status-stamp {
+    transform: none;
+  }
+
+  .ticket-footer-note {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prediction-ticket-score-row {
+    flex-wrap: wrap;
+  }
+
+  .prediction-ticket-score {
+    font-size: 1.08rem;
+  }
+
+  .prediction-ticket-points {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-points-total {
+    grid-column: auto;
+  }
+
   .game-card-nav {
     flex-wrap: wrap;
   }
@@ -1131,6 +1584,17 @@ th.sortable:focus-visible,
 
   .upcoming-card-header {
     font-size: 0.95rem;
+  }
+
+  .ticket-top-band {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .ticket-shell::before,
+  .ticket-shell::after {
+    display: none;
   }
 
   .player-toggles {

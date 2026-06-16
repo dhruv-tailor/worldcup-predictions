@@ -1,6 +1,7 @@
+import { useCallback, useRef } from 'react';
 import { Link } from 'react-router';
 import type { Game, PlayerScore, ScoringSystem } from '../types';
-import { getGameLabel } from '../utils/flags';
+import { getFlag, getGameLabel } from '../utils/flags';
 
 interface GameCardProps {
   game: Game;
@@ -9,7 +10,31 @@ interface GameCardProps {
   system: ScoringSystem;
 }
 
+function ticketRef(name: string, gameId: number) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? 'X')
+    .join('');
+  const suffix = String((name.length * 137 + gameId * 97) % 10000).padStart(4, '0');
+  return `${initials}${String(gameId).padStart(3, '0')}-${suffix}`;
+}
+
+function pickWinner(home: number, away: number): 'home' | 'away' | 'draw' {
+  if (home > away) return 'home';
+  if (away > home) return 'away';
+  return 'draw';
+}
+
+function ticketExtras(name: string, gameId: number) {
+  const gate = String.fromCharCode(65 + ((gameId + name.length) % 6));
+  const batch = `Batch ${(name.length * 31 + gameId * 17) % 900 + 100}`;
+  return { gate: `Gate ${gate}`, batch };
+}
+
 export default function GameCard({ game, games, standings, system }: GameCardProps) {
+  const ticketRefs = useRef<Record<string, HTMLElement | null>>({});
   const isPlayed = game.homeScore !== null && game.awayScore !== null;
   const isHomeWinner = isPlayed && game.homeScore! > game.awayScore!;
   const isAwayWinner = isPlayed && game.awayScore! > game.homeScore!;
@@ -26,6 +51,19 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
     })
     .filter(Boolean)
     .sort((a, b) => b!.points.total - a!.points.total);
+
+  const handlePrintTicket = useCallback(async (key: string, playerName: string) => {
+    const target = ticketRefs.current[key];
+    if (!target) return;
+
+    const { toPng } = await import('html-to-image');
+    const dataUrl = await toPng(target, { backgroundColor: '#f5f1e7', pixelRatio: 3 });
+    const safeName = playerName.toLowerCase().replace(/\s+/g, '-');
+    const link = document.createElement('a');
+    link.download = `print-ticket-match-${game.id}-${safeName}.png`;
+    link.href = dataUrl;
+    link.click();
+  }, [game.id]);
 
   return (
     <div className="game-card">
@@ -47,6 +85,11 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
         <h2>
           {getGameLabel(game)}
         </h2>
+        <div className="game-card-fixture ticket-fixture">
+          <span className="ticket-fixture-team">{game.home} {getFlag(game.home)}</span>
+          <span className="ticket-fixture-vs">vs</span>
+          <span className="ticket-fixture-team">{getFlag(game.away)} {game.away}</span>
+        </div>
         {isPlayed ? (
           <div className="actual-score final-scoreline">
             <span className={`final-team ${isHomeWinner ? 'winner-team' : ''}`}>
@@ -62,50 +105,100 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
         )}
       </div>
 
-      <table className="predictions-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Prediction</th>
-            {isPlayed && (
-              <>
-                {system.categoryLabels.map((cat) => (
-                  <th key={cat.key}>{cat.label}</th>
-                ))}
-                <th>Total</th>
-              </>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {predictions.map((p) => (
-            <tr key={p!.name}>
-              <td>{p!.name}</td>
-              <td>
-                {p!.prediction.homeScore} – {p!.prediction.awayScore}
-                {isPlayed && p!.prediction.homeScore === game.homeScore && p!.prediction.awayScore === game.awayScore && (
-                  <span className="exact-hit-badge">🎯 EXACT!</span>
+      <div className="prediction-ticket-list">
+        {predictions.map((p) => {
+          const ticketKey = `${game.id}-${p!.name}`;
+          const extras = ticketExtras(p!.name, game.id);
+          const predictedWinner = pickWinner(p!.prediction.homeScore, p!.prediction.awayScore);
+          const actualWinner = isPlayed ? pickWinner(game.homeScore!, game.awayScore!) : null;
+          const isOutcomeHit = isPlayed && predictedWinner === actualWinner;
+          const isExact =
+            isPlayed &&
+            p!.prediction.homeScore === game.homeScore &&
+            p!.prediction.awayScore === game.awayScore;
+
+          return (
+            <article
+              key={p!.name}
+              className={`prediction-ticket ticket-shell ${isExact ? 'ticket-exact' : ''} ${isPlayed ? (isOutcomeHit ? 'ticket-hit' : 'ticket-miss') : ''}`}
+              ref={(el) => {
+                ticketRefs.current[ticketKey] = el;
+              }}
+            >
+              <span className="ticket-corner-fold" aria-hidden="true" />
+              <div className="ticket-top-band">
+                <span className="ticket-event">OFFICIAL MATCH PREDICTION TICKET</span>
+                <span className="ticket-serial">REF {ticketRef(p!.name, game.id)}</span>
+              </div>
+
+              <div className="prediction-ticket-head">
+                <div>
+                  <p className="prediction-ticket-kicker">Holder</p>
+                  <h4>{p!.name}</h4>
+                </div>
+                <div className="prediction-ticket-meta">
+                  <span>Match {game.id}</span>
+                  <span>{system.name}</span>
+                </div>
+              </div>
+
+              <div className="ticket-chip-row">
+                <span className="ticket-chip">{extras.gate}</span>
+              </div>
+
+              <div className="prediction-ticket-score-row">
+                <span className="ticket-fixture">{game.home} vs {game.away}</span>
+                <span className="prediction-ticket-score">{p!.prediction.homeScore} – {p!.prediction.awayScore}</span>
+                {isExact && <span className="exact-hit-badge">🎯 EXACT!</span>}
+                {isPlayed && !isExact && (
+                  <span className={`ticket-status-stamp ${isOutcomeHit ? 'ticket-status-hit' : 'ticket-status-miss'}`}>
+                    {isOutcomeHit ? 'Winning Pick' : 'Miss'}
+                  </span>
                 )}
-              </td>
+              </div>
+
               {isPlayed && (
                 <>
-                  {system.categoryLabels.map((cat) => {
-                    const val = p!.points.categories[cat.key] ?? 0;
-                    return (
-                      <td key={cat.key} className={val > 0 ? 'pts-good' : 'pts-zero'}>
-                        {val > 0 ? `+${val}` : '0'}
-                      </td>
-                    );
-                  })}
-                  <td className={`total ${pointsClass(p!.points.total, system.maxPerGame)}`}>
-                    {p!.points.total}
-                  </td>
+                  <div className="ticket-perf" aria-hidden="true" />
+                  <div className="prediction-ticket-points">
+                    {system.categoryLabels.map((cat) => {
+                      const val = p!.points.categories[cat.key] ?? 0;
+                      return (
+                        <div key={cat.key} className="ticket-points-cell">
+                          <span className="ticket-points-label">{cat.label}</span>
+                          <span className={val > 0 ? 'pts-good' : 'pts-zero'}>{val > 0 ? `+${val}` : '0'}</span>
+                        </div>
+                      );
+                    })}
+                    <div className="ticket-points-total">
+                      <span>Total</span>
+                      <strong className={pointsClass(p!.points.total, system.maxPerGame)}>{p!.points.total}</strong>
+                    </div>
+                  </div>
                 </>
               )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+              <div className="ticket-footer-note">
+                <span>{isPlayed ? 'Validated Result Slip' : 'Pending Result Validation'}</span>
+                {isPlayed && isExact && <span className="ticket-status-stamp ticket-status-hit">Top Hit</span>}
+                <button
+                  className="ticket-print-btn"
+                  type="button"
+                  onClick={() => handlePrintTicket(ticketKey, p!.name)}
+                  aria-label={`Print ticket for ${p!.name}`}
+                >
+                  Print Ticket
+                </button>
+                <span className="ticket-barcode" aria-hidden="true" />
+              </div>
+              <div className="ticket-audit-row">
+                <span>Issuer: Prediction Office</span>
+                <span>{extras.batch}</span>
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }
