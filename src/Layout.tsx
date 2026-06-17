@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router';
 import { useAppContext } from './context/useAppContext';
 import { scoringSystems } from './utils/scoring';
 import ScoringSelector from './components/ScoringSelector';
-import './App.css';
+import './styles/index.css';
 
 export default function Layout() {
   const location = useLocation();
@@ -42,9 +42,9 @@ export default function Layout() {
           </NavLink>
           {firstPlayer && (
             <NavLink
-              to={`/player/${encodeURIComponent(firstPlayer)}`}
+              to="/players"
               className={({ isActive }) =>
-                isActive || location.pathname.startsWith('/player/')
+                isActive || location.pathname.startsWith('/player/') || location.pathname.startsWith('/players')
                   ? 'nav-link active'
                   : 'nav-link'
               }

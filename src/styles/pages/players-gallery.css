@@ -1,0 +1,116 @@
+/* Players Collection */
+.players-gallery-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.players-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--card-shell-border);
+  border-radius: 14px;
+  background: var(--card-gallery-bg);
+  box-shadow: var(--card-shell-shadow);
+}
+
+.players-gallery-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--card-muted);
+  margin-bottom: 4px;
+}
+
+.players-gallery-header h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--card-text);
+}
+
+.players-gallery-header p {
+  margin-top: 6px;
+  color: var(--card-muted);
+  max-width: 58ch;
+}
+
+.players-gallery-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.players-gallery-meta span {
+  border: 1px solid var(--card-chip-border);
+  background: var(--card-chip-bg);
+  color: var(--card-text);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.players-gallery-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.players-print-btn {
+  border: 1px solid var(--card-chip-border);
+  background: var(--card-chip-bg);
+  color: var(--card-text);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.players-print-btn:hover {
+  background: color-mix(in srgb, var(--card-chip-bg) 70%, var(--card-link-bg) 30%);
+  transform: translateY(-1px);
+}
+
+.players-print-btn:active {
+  transform: translateY(1px);
+}
+
+.players-gallery-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--card-muted);
+}
+
+.players-gallery-controls select {
+  min-width: 160px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--card-chip-border);
+  background: var(--card-chip-bg);
+  color: var(--card-text);
+}
+
+.players-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  contain: layout style;
+}
+
+.player-card-wrap {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+

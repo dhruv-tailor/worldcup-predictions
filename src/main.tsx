@@ -11,6 +11,7 @@ const GamePage = lazy(() => import('./pages/GamePage'))
 const BreakdownPage = lazy(() => import('./pages/BreakdownPage'))
 const UpcomingPage = lazy(() => import('./pages/UpcomingPage'))
 const PlayerPage = lazy(() => import('./pages/PlayerPage'))
+const PlayersPage = lazy(() => import('./pages/PlayersPage'))
 
 const router = createBrowserRouter(
   [
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
         { path: 'game/:id', element: <GamePage /> },
         { path: 'breakdown', element: <BreakdownPage /> },
         { path: 'upcoming', element: <UpcomingPage /> },
+        { path: 'players', element: <PlayersPage /> },
         { path: 'player/:name', element: <PlayerPage /> },
       ],
     },

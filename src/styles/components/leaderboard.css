@@ -1,0 +1,198 @@
+/* Leaderboard */
+.leaderboard {
+  overflow-x: auto;
+}
+
+.leaderboard-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.lb-toggle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  color: var(--text-h);
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.lb-toggle-btn:hover {
+  background: var(--accent-bg);
+}
+
+.lb-toggle-btn[aria-pressed="true"] {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.lb-clear-btn {
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.lb-filter-select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 0.85rem;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.sortable:hover {
+  background: var(--accent-bg);
+}
+
+.leaderboard th.sorted {
+  background: var(--accent-bg);
+}
+
+.row-highlighted {
+  background: var(--accent-bg) !important;
+}
+
+.row-dimmed {
+  opacity: 0.4;
+}
+
+.leaderboard tbody tr {
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.leaderboard tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.leaderboard tbody tr:first-child {
+  background: linear-gradient(90deg, rgba(245, 166, 35, 0.12), rgba(245, 166, 35, 0.03));
+}
+
+.leaderboard table,
+.predictions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.leaderboard th,
+.leaderboard td,
+.predictions-table th,
+.predictions-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.leaderboard th,
+.predictions-table th {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.045) 0,
+      rgba(255, 255, 255, 0.045) 1px,
+      transparent 1px,
+      transparent 12px
+    ),
+    var(--code-bg);
+  color: var(--text-h);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.name-col {
+  text-align: left !important;
+  font-weight: 500;
+}
+
+.rank-col {
+  width: 40px;
+  color: var(--text);
+}
+
+.total-col {
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.streak-col {
+  text-align: center;
+  width: 50px;
+  color: var(--text);
+}
+
+.stat-col {
+  text-align: center;
+  width: 55px;
+  color: var(--text);
+  font-size: 0.85em;
+}
+
+.delta-col {
+  text-align: center;
+  width: 45px;
+  font-size: 0.85em;
+  color: var(--text-dim, #888);
+}
+
+.delta-pos {
+  color: #22c55e;
+}
+
+.delta-neg {
+  color: #f44336;
+}
+
+.game-col.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.game-col.clickable:hover {
+  background: var(--accent-bg);
+}
+
+/* Point colors */
+.pts-perfect {
+  color: #f5a623;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(245, 166, 35, 0.35);
+  animation: perfectPulse 1.8s ease-in-out infinite;
+}
+
+.pts-great {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.pts-good {
+  color: #16a34a;
+}
+
+.pts-ok {
+  color: var(--text);
+}
+
+.pts-zero {
+  color: #9ca3af;
+}
+
+/* Leaderboard row hover */
+.leaderboard tbody tr:hover {
+  background: var(--accent-bg);
+}
+

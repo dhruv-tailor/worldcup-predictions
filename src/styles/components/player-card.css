@@ -1,0 +1,299 @@
+.player-card-wrap {
+  aspect-ratio: 5 / 7;
+  animation: playerCardIn 0.5s ease both;
+}
+
+.player-card-wrap.podium-1 .player-card-face {
+  box-shadow: var(--card-shell-shadow), 0 0 0 1px rgba(216, 187, 101, 0.5), 0 0 24px rgba(216, 187, 101, 0.22);
+}
+
+.player-card-wrap.podium-2 .player-card-face {
+  box-shadow: var(--card-shell-shadow), 0 0 0 1px rgba(212, 201, 175, 0.44), 0 0 16px rgba(212, 201, 175, 0.18);
+}
+
+.player-card-wrap.podium-3 .player-card-face {
+  box-shadow: var(--card-shell-shadow), 0 0 0 1px rgba(165, 116, 78, 0.4), 0 0 16px rgba(165, 116, 78, 0.16);
+}
+
+.player-card-face {
+  position: relative;
+  height: 100%;
+  border-radius: 10px;
+  border: 4px solid var(--card-shell-border);
+  background: linear-gradient(180deg, var(--card-shell-top), var(--card-shell-bottom));
+  box-shadow: var(--card-shell-shadow), inset 0 0 0 2px var(--card-frame-inset);
+  color: var(--card-text);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.player-card-face.frame-legendary {
+  border-color: var(--card-tier-legendary-b);
+}
+
+.player-card-face.frame-epic {
+  border-color: var(--card-tier-epic-a);
+}
+
+.player-card-face.frame-rare {
+  border-color: var(--card-tier-rare-a);
+}
+
+.player-card-face.frame-common {
+  border-color: var(--card-tier-common-a);
+}
+
+.player-card-front::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(76, 62, 37, 0.1) 0.35px, transparent 0.45px),
+    radial-gradient(rgba(255, 245, 222, 0.1) 0.3px, transparent 0.4px);
+  background-size: 4px 4px, 6px 6px;
+  background-position: 0 0, 2px 3px;
+  opacity: 0.14;
+}
+
+.player-card-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 0 0, rgba(98, 79, 50, 0.14) 0 7px, transparent 8px),
+    radial-gradient(circle at 100% 0, rgba(98, 79, 50, 0.12) 0 6px, transparent 7px),
+    radial-gradient(circle at 0 100%, rgba(98, 79, 50, 0.1) 0 5px, transparent 6px),
+    radial-gradient(circle at 100% 100%, rgba(98, 79, 50, 0.1) 0 5px, transparent 6px);
+  opacity: 0.28;
+}
+
+.player-card-face.frame-legendary .player-card-radar::before {
+  content: '';
+  position: absolute;
+  inset: -45% -70%;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 42%, rgba(255, 233, 176, 0.22) 50%, transparent 58%);
+  animation: shimmer 6.2s ease-in-out infinite;
+}
+
+.player-card-front {
+  z-index: 2;
+}
+
+.player-card-single {
+  contain: layout style;
+}
+
+.player-card-header-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: -2px -2px 0;
+  padding: 6px 10px 7px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #355738, var(--card-head-bg));
+  box-shadow: inset 0 -1px 0 rgba(245, 240, 227, 0.14);
+  position: relative;
+  z-index: 1;
+}
+
+.player-card-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #2b1f14;
+  border: 2px solid rgba(245, 240, 227, 0.8);
+  box-shadow: 0 2px 6px rgba(43, 31, 20, 0.22);
+}
+
+.player-card-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+
+.player-card-avatar.avatar-tier-legend {
+  background: linear-gradient(145deg, var(--card-tier-legendary-a), var(--card-tier-legendary-b));
+}
+
+.player-card-avatar.avatar-tier-epic {
+  background: linear-gradient(145deg, #d3bc82, #b08f47);
+}
+
+.player-card-avatar.avatar-tier-rare {
+  background: linear-gradient(145deg, #d1b47a, #9f8044);
+}
+
+.player-card-avatar.avatar-tier-common {
+  background: linear-gradient(145deg, #c8ac7a, #9f8255);
+}
+
+.player-card-namegroup h3 {
+  margin: 0;
+  font-family: 'Barlow Condensed', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 1.16rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--card-banner-text);
+  text-shadow: -0.35px 0 rgba(211, 80, 64, 0.13), 0.35px 0 rgba(57, 121, 190, 0.14);
+}
+
+.player-card-name-metrics {
+  margin: 3px 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: rgba(245, 240, 227, 0.78);
+  white-space: nowrap;
+}
+
+.player-card-radar {
+  margin-top: 8px;
+  border: 2px solid var(--card-frame-inset);
+  border-radius: 8px;
+  background: var(--card-radar-bg);
+  box-shadow: inset 0 1px 4px rgba(43, 31, 20, 0.12);
+  padding: 4px 6px 10px;
+  position: relative;
+  z-index: 1;
+  flex: 1 1 58%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.player-card-bottom-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, auto);
+  gap: 4px;
+  border-top: 2px solid var(--card-frame-inset);
+  padding-top: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.player-card-bottom-grid::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--card-stat-divider);
+  opacity: 0.85;
+}
+
+.player-card-stat-cell {
+  border-radius: 6px;
+  padding: 1px 4px;
+  background: transparent;
+}
+
+.player-card-stat-cell span {
+  display: block;
+  font-size: 0.58rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--card-muted);
+}
+
+.player-card-stat-cell strong {
+  display: block;
+  margin-top: 1px;
+  color: var(--card-text);
+  font-size: clamp(0.7rem, 1.5vw, 0.82rem);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.player-card-role-box {
+  border-radius: 6px;
+  border: 1px solid var(--card-stat-divider);
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  background: rgba(232, 223, 200, 0.45);
+}
+
+.player-card-role-box.face {
+  border-color: rgba(44, 110, 73, 0.6);
+}
+
+.player-card-role-box.heel {
+  border-color: rgba(163, 72, 56, 0.62);
+}
+
+.player-card-role-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--card-muted);
+}
+
+.player-card-role-label::before {
+  content: '';
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  border: 1px solid rgba(43, 31, 20, 0.32);
+  background: rgba(120, 104, 79, 0.45);
+}
+
+.player-card-role-box.face .player-card-role-label::before {
+  background: rgba(44, 110, 73, 0.72);
+}
+
+.player-card-role-box.heel .player-card-role-label::before {
+  background: rgba(163, 72, 56, 0.75);
+}
+
+.player-card-role-flag {
+  font-size: clamp(1.55rem, 4.2vw, 1.95rem);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+}
+
+@keyframes playerCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) rotate(-0.35deg) scale(0.982);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes perfectPulse {
+  0%, 100% { text-shadow: 0 0 6px rgba(245, 166, 35, 0.2); }
+  50% { text-shadow: 0 0 14px rgba(245, 166, 35, 0.45); }
+}
+
