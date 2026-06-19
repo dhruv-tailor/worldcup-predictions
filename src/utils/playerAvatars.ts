@@ -14,9 +14,7 @@ for (const [filePath, imageUrl] of Object.entries(avatarModules)) {
   avatarByName.set(normalizePlayerKey(match[1]), imageUrl);
 }
 
-const avatarAliases: Record<string, string> = {
-  d4: 'aco',
-};
+const avatarAliases: Record<string, string> = {};
 
 export function getPlayerAvatar(playerName: string): string | null {
   const normalized = normalizePlayerKey(playerName);

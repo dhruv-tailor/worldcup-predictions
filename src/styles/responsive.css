@@ -193,6 +193,19 @@ th.sortable:focus-visible,
     font-size: 0.66rem;
   }
 
+  .player-card-ovr-badge {
+    width: 44px;
+    min-height: 48px;
+  }
+
+  .player-card-ovr-score {
+    font-size: 1.22rem;
+  }
+
+  .player-card-ovr-grade {
+    font-size: 0.54rem;
+  }
+
   .player-card-radar {
     margin-top: 7px;
   }
@@ -352,6 +365,19 @@ th.sortable:focus-visible,
 
   .player-card-name-metrics {
     font-size: 0.62rem;
+  }
+
+  .player-card-ovr-badge {
+    width: 40px;
+    min-height: 44px;
+  }
+
+  .player-card-ovr-score {
+    font-size: 1.1rem;
+  }
+
+  .player-card-ovr-grade {
+    font-size: 0.5rem;
   }
 
   .players-gallery-controls {

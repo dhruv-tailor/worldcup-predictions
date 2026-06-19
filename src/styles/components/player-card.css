@@ -90,7 +90,7 @@
 
 .player-card-header-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
   margin: -2px -2px 0;
@@ -159,6 +159,45 @@
   letter-spacing: 0.06em;
   color: rgba(245, 240, 227, 0.78);
   white-space: nowrap;
+}
+
+.player-card-ovr-badge {
+  width: 48px;
+  min-height: 52px;
+  border: 1px solid rgba(241, 218, 156, 0.7);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(30, 63, 34, 0.45), rgba(18, 42, 24, 0.7));
+  box-shadow: inset 0 0 0 1px rgba(255, 232, 176, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: var(--card-banner-text);
+}
+
+.player-card-ovr-label {
+  font-size: 0.45rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  opacity: 0.88;
+  line-height: 1;
+}
+
+.player-card-ovr-score {
+  font-family: 'Barlow Condensed', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 1.35rem;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: #f5f0e3;
+}
+
+.player-card-ovr-grade {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  color: #f3d68d;
 }
 
 .player-card-radar {

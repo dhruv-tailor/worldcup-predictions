@@ -36,6 +36,16 @@ export interface CrossSystemRank {
   keyStat: string;
 }
 
+const MAX_REASONABLE_PREDICTED_GOALS = 50;
+
+function isReasonablePredictedScore(score: number): boolean {
+  return Number.isFinite(score) && score >= 0 && score <= MAX_REASONABLE_PREDICTED_GOALS;
+}
+
+function shouldIncludePredictionInErrorAverages(homeScore: number, awayScore: number): boolean {
+  return isReasonablePredictedScore(homeScore) && isReasonablePredictedScore(awayScore);
+}
+
 export function getPlayerGameHistory(player: PlayerScore, games: Game[]): PlayerGameHistoryItem[] {
   const gameMap = new Map<number, Game>(games.map((g) => [g.id, g]));
 
@@ -73,6 +83,7 @@ export function getPlayerAccuracy(player: PlayerScore, games: Game[]): PlayerAcc
   let totalError = 0;
   let totalHomeError = 0;
   let totalAwayError = 0;
+  let errorSampleCount = 0;
 
   const teamErrorBuckets = new Map<string, number[]>();
 
@@ -94,9 +105,14 @@ export function getPlayerAccuracy(player: PlayerScore, games: Game[]): PlayerAcc
     const awayError = Math.abs(gb.prediction.awayScore - game.awayScore);
     const gameError = homeError + awayError;
 
+    if (!shouldIncludePredictionInErrorAverages(gb.prediction.homeScore, gb.prediction.awayScore)) {
+      continue;
+    }
+
     totalError += gameError;
     totalHomeError += homeError;
     totalAwayError += awayError;
+    errorSampleCount += 1;
 
     const homeBucket = teamErrorBuckets.get(game.home) ?? [];
     homeBucket.push(gameError);
@@ -135,9 +151,9 @@ export function getPlayerAccuracy(player: PlayerScore, games: Game[]): PlayerAcc
     winnerPct: playedPredictions > 0 ? round((winnerCorrectCount / playedPredictions) * 100) : 0,
     exactCount,
     exactPct: playedPredictions > 0 ? round((exactCount / playedPredictions) * 100) : 0,
-    avgError: playedPredictions > 0 ? round(totalError / playedPredictions) : 0,
-    homeAvgError: playedPredictions > 0 ? round(totalHomeError / playedPredictions) : 0,
-    awayAvgError: playedPredictions > 0 ? round(totalAwayError / playedPredictions) : 0,
+    avgError: errorSampleCount > 0 ? round(totalError / errorSampleCount) : 0,
+    homeAvgError: errorSampleCount > 0 ? round(totalHomeError / errorSampleCount) : 0,
+    awayAvgError: errorSampleCount > 0 ? round(totalAwayError / errorSampleCount) : 0,
     bestTeam,
     bestTeamError: bestTeamError !== null ? round(bestTeamError) : null,
     worstTeam,
