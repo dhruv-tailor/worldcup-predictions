@@ -37,6 +37,9 @@ export default function Layout() {
           <NavLink to="/breakdown" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🏅 All Systems
           </NavLink>
+          <NavLink to="/control" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            👑 Control
+          </NavLink>
           <NavLink to="/upcoming" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🔮 Upcoming
           </NavLink>

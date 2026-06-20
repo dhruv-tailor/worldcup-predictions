@@ -3,6 +3,7 @@
 @import './components/leaderboard.css';
 @import './components/game-card.css';
 @import './components/score-chart.css';
+@import './components/leaderboard-control.css';
 @import './components/category-breakdown.css';
 @import './components/upcoming-games.css';
 @import './pages/player-profile.css';

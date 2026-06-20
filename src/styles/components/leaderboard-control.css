@@ -1,0 +1,187 @@
+/* Leaderboard Control Chart: Warring States theme */
+.leaderboard-control-chart {
+  position: relative;
+  margin-bottom: 32px;
+  padding: 18px;
+  border: 1px solid #8f6a3f;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(124, 86, 51, 0.2), transparent 38%),
+    radial-gradient(circle at 88% 15%, rgba(112, 72, 38, 0.18), transparent 44%),
+    repeating-linear-gradient(0deg, rgba(89, 58, 27, 0.035) 0px, rgba(89, 58, 27, 0.035) 1px, transparent 1px, transparent 5px),
+    linear-gradient(165deg, #f3e4c2, #e8d2a7 58%, #dcc08e);
+  color: #2d2014;
+  box-shadow: 0 10px 24px rgba(48, 31, 17, 0.24);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leaderboard-control-chart::before,
+.leaderboard-control-chart::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.leaderboard-control-chart::before {
+  top: 10px;
+  background: linear-gradient(90deg, transparent, #8f5b35 20%, #6a3f24 50%, #8f5b35 80%, transparent);
+  opacity: 0.6;
+}
+
+.leaderboard-control-chart::after {
+  bottom: 10px;
+  background: linear-gradient(90deg, transparent, #6a3f24 20%, #8f5b35 50%, #6a3f24 80%, transparent);
+  opacity: 0.5;
+}
+
+.leaderboard-control-chart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(48, 31, 17, 0.34);
+}
+
+.leaderboard-control-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.leaderboard-control-header h3 {
+  margin: 0;
+  font-size: 1.22rem;
+  color: #4f2016;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+}
+
+.leaderboard-control-header p {
+  margin: 6px 0 0;
+  color: #5d4730;
+  font-size: 0.84rem;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+}
+
+.leaderboard-control-chart.empty {
+  color: #5d4730;
+  border-color: #8f6a3f;
+}
+
+.leaderboard-control-chart .chart-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.leaderboard-control-chart .chart-type-btn {
+  background: linear-gradient(160deg, #4a2f1d, #352315);
+  border: 1px solid #7a583a;
+  border-radius: 4px;
+  color: #efdfbd;
+  font-size: 0.78rem;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+  letter-spacing: 0.02em;
+}
+
+.leaderboard-control-chart .chart-type-btn:hover {
+  background: linear-gradient(160deg, #5b3a23, #3d2918);
+}
+
+.leaderboard-control-chart .chart-type-btn.active {
+  background: linear-gradient(160deg, #8f251e, #6a1714);
+  border-color: #bc3a2f;
+  color: #fff4df;
+}
+
+.control-eras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.era-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid #8f6a3f;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+}
+
+.era-chip.stable {
+  background: linear-gradient(145deg, #b1251c, #8d1f19);
+  color: #f9edd8;
+  border-color: #6f1613;
+  box-shadow: inset 0 0 0 1px rgba(255, 231, 207, 0.15), 0 2px 6px rgba(66, 14, 12, 0.25);
+}
+
+.era-chip.golden {
+  background: linear-gradient(145deg, #f0cc67, #c8961a);
+  color: #3f2a00;
+  border-color: #8d6510;
+  box-shadow: inset 0 0 0 1px rgba(255, 248, 214, 0.55), 0 2px 8px rgba(120, 84, 14, 0.35);
+}
+
+.era-chip.chaotic {
+  background: linear-gradient(160deg, #3a3a3a, #232323);
+  color: #f2e9d4;
+  border-color: #101010;
+}
+
+.leaderboard-control-chart .player-toggles {
+  margin: 12px 0;
+  gap: 7px;
+}
+
+.leaderboard-control-chart .player-toggle-btn {
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(165deg, #2f2218, #1f1711);
+  border-width: 1px;
+  color: #f7eedf !important;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(246, 223, 181, 0.08);
+}
+
+.leaderboard-control-chart .player-toggle-btn.hidden-player {
+  opacity: 0.45;
+}
+
+.leaderboard-control-chart .player-toggle-btn:hover {
+  background: linear-gradient(165deg, #3b2a1e, #271c14);
+}
+
+.leaderboard-control-chart .recharts-cartesian-grid line {
+  stroke: rgba(82, 58, 33, 0.22) !important;
+}
+
+.leaderboard-control-chart .recharts-text {
+  fill: #4d3a28;
+  font-family: 'Noto Serif SC', 'Times New Roman', serif;
+}
+
+.leaderboard-control-chart .recharts-legend-item-text {
+  color: #4d3a28 !important;
+}
+
+@media (max-width: 640px) {
+  .leaderboard-control-chart {
+    padding: 14px;
+  }
+
+  .leaderboard-control-header h3 {
+    font-size: 1.08rem;
+  }
+}
