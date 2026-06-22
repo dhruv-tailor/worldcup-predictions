@@ -8,5 +8,6 @@
 @import './components/upcoming-games.css';
 @import './pages/player-profile.css';
 @import './pages/players-gallery.css';
+@import './pages/dashboard.css';
 @import './components/player-card.css';
 @import './responsive.css';
