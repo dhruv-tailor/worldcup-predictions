@@ -325,16 +325,17 @@
 .upcoming-player {
   font-weight: 600;
   min-width: 0;
-  flex: 1 1 auto;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block;
   white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.1;
 }
 
 .upcoming-player-wrap {
   display: block;
-  overflow: hidden;
+  overflow: visible;
   min-width: 0;
   max-width: 100%;
 }
@@ -539,4 +540,3 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-

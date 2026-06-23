@@ -1,6 +1,7 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { Game, PlayerScore, ScoringSystem } from '../types';
+import { useAppContext } from '../context/useAppContext';
 import { getFlag, getGameLabel } from '../utils/flags';
 import { createBarcodePattern } from '../utils/barcode';
 
@@ -35,7 +36,11 @@ function ticketExtras(name: string, gameId: number) {
 }
 
 export default function GameCard({ game, games, standings, system }: GameCardProps) {
+  const { updateGame, isAdmin } = useAppContext();
   const ticketRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editHome, setEditHome] = useState(game.homeScore?.toString() || '');
+  const [editAway, setEditAway] = useState(game.awayScore?.toString() || '');
   const isPlayed = game.homeScore !== null && game.awayScore !== null;
   const isHomeWinner = isPlayed && game.homeScore! > game.awayScore!;
   const isAwayWinner = isPlayed && game.awayScore! > game.homeScore!;
@@ -100,9 +105,67 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
             <span className={`final-team ${isAwayWinner ? 'winner-team' : ''}`}>
               {isAwayWinner ? '🏆 ' : ''}{game.awayScore} {game.away}
             </span>
+            {isAdmin && (
+              <button
+                className="game-card-edit-btn"
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditHome(game.homeScore?.toString() || '');
+                  setEditAway(game.awayScore?.toString() || '');
+                }}
+              >
+                Edit
+              </button>
+            )}
           </div>
         ) : (
-          <div className="actual-score pending">Not yet played</div>
+          <>
+            <div className="actual-score pending">Not yet played</div>
+            {isAdmin && (
+              <>
+                {isEditing ? (
+                  <div className="game-card-score-editor">
+                    <input
+                      type="number"
+                      value={editHome}
+                      onChange={(e) => setEditHome(e.target.value)}
+                      placeholder="Home"
+                      min="0"
+                    />
+                    <span>vs</span>
+                    <input
+                      type="number"
+                      value={editAway}
+                      onChange={(e) => setEditAway(e.target.value)}
+                      placeholder="Away"
+                      min="0"
+                    />
+                    <button
+                      className="btn-save"
+                      onClick={() => {
+                        const hs = editHome ? parseInt(editHome) : null;
+                        const as = editAway ? parseInt(editAway) : null;
+                        updateGame(game.id, hs, as);
+                        setIsEditing(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button className="btn-cancel" onClick={() => setIsEditing(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="game-card-enter-result-btn"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Enter Result
+                  </button>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
 

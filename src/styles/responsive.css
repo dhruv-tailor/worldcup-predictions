@@ -172,7 +172,8 @@ th.sortable:focus-visible,
   }
 
   .players-card-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, var(--trading-card-width));
+    justify-content: center;
   }
 
   .player-card-header-row {
@@ -417,7 +418,8 @@ th.sortable:focus-visible,
   }
 
   .players-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, var(--trading-card-width));
+    justify-content: center;
     gap: 10mm;
   }
 

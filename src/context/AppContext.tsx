@@ -1,12 +1,85 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import type { Game, Prediction } from '../types';
 import { parseGames, parsePredictions } from '../utils/parseData';
 import { scoringSystems } from '../utils/scoring';
+import { loadGames, saveGames, loadPredictions, savePredictions, isAdminMode, setAdminMode } from '../utils/storage';
 import { AppContext } from './appContextStore';
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const games = useMemo(() => parseGames(), []);
-  const predictions = useMemo(() => parsePredictions(), []);
+  // Initialize games from localStorage or CSV
+  const [games, setGames] = useState<Game[]>(() => {
+    const stored = loadGames();
+    return stored || parseGames();
+  });
+
+  // Initialize predictions from localStorage or CSV
+  const [predictions, setPredictions] = useState<Prediction[]>(() => {
+    const stored = loadPredictions();
+    return stored || parsePredictions();
+  });
+
+  // Admin mode is enabled by default; persisted value is respected once set.
+  const [isAdmin, setIsAdminInternal] = useState(() => {
+    const hasStoredValue = localStorage.getItem('wc-admin') !== null;
+    if (!hasStoredValue) return true;
+    return isAdminMode();
+  });
+
+  const setIsAdmin = useCallback((enabled: boolean) => {
+    setAdminMode(enabled);
+    setIsAdminInternal(enabled);
+  }, []);
+
+  // Persist games to localStorage whenever they change
+  useEffect(() => {
+    saveGames(games);
+  }, [games]);
+
+  // Persist predictions to localStorage whenever they change
+  useEffect(() => {
+    savePredictions(predictions);
+  }, [predictions]);
+
+  // Mutation functions
+  const updateGame = useCallback((id: number, homeScore: number | null, awayScore: number | null) => {
+    setGames((prev) =>
+      prev.map((g) => (g.id === id ? { ...g, homeScore, awayScore } : g))
+    );
+  }, []);
+
+  const addGame = useCallback((game: Omit<Game, 'id'>) => {
+    setGames((prev) => {
+      const nextId = Math.max(...prev.map((g) => g.id), 0) + 1;
+      return [...prev, { ...game, id: nextId }];
+    });
+  }, []);
+
+  const updatePrediction = useCallback(
+    (name: string, gameId: number, homeScore: number, awayScore: number) => {
+      setPredictions((prev) =>
+        prev.map((p) =>
+          p.name === name && p.gameId === gameId
+            ? { ...p, homeScore, awayScore }
+            : p
+        )
+      );
+    },
+    []
+  );
+
+  const addPrediction = useCallback((prediction: Prediction) => {
+    setPredictions((prev) => [...prev, prediction]);
+  }, []);
+
+  const deletePrediction = useCallback((name: string, gameId: number) => {
+    setPredictions((prev) => prev.filter((p) => !(p.name === name && p.gameId === gameId)));
+  }, []);
+
+  const resetData = useCallback(() => {
+    setGames(parseGames());
+    setPredictions(parsePredictions());
+  }, []);
 
   const [selectedSystem, setSelectedSystem] = useState(scoringSystems[0]);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -32,6 +105,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       standings,
       theme,
       setTheme,
+      isAdmin,
+      setIsAdmin,
+      updateGame,
+      addGame,
+      updatePrediction,
+      addPrediction,
+      deletePrediction,
+      resetData,
     }}>
       {children}
     </AppContext>

@@ -7,7 +7,7 @@ import './styles/index.css';
 
 export default function Layout() {
   const location = useLocation();
-  const { games, standings, theme, setTheme, selectedSystem, setSelectedSystem } = useAppContext();
+  const { games, standings, theme, setTheme, selectedSystem, setSelectedSystem, isAdmin } = useAppContext();
   const playedCount = games.filter((g) => g.homeScore !== null).length;
   const playedPct = games.length > 0 ? Math.round((playedCount / games.length) * 100) : 0;
   const firstPlayer = standings[0]?.name;
@@ -31,10 +31,13 @@ export default function Layout() {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            📊 Dashboard
-          </NavLink>
-          <NavLink to="/breakdown" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              isActive || location.pathname === '/breakdown' ? 'nav-link active' : 'nav-link'
+            }
+          >
             🏅 All Systems
           </NavLink>
           <NavLink to="/control" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
@@ -53,6 +56,11 @@ export default function Layout() {
               }
             >
               👤 Players
+            </NavLink>
+          )}
+          {isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              🔧 Admin
             </NavLink>
           )}
         </nav>

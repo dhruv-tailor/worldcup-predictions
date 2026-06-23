@@ -6,26 +6,27 @@ import { AppProvider } from './context/AppContext'
 import Layout from './Layout'
 import './index.css'
 
-const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const GamePage = lazy(() => import('./pages/GamePage'))
 const BreakdownPage = lazy(() => import('./pages/BreakdownPage'))
 const UpcomingPage = lazy(() => import('./pages/UpcomingPage'))
 const PlayerPage = lazy(() => import('./pages/PlayerPage'))
 const PlayersPage = lazy(() => import('./pages/PlayersPage'))
 const ControlPage = lazy(() => import('./pages/ControlPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 const router = createBrowserRouter(
   [
     {
       element: <Layout />,
       children: [
-        { index: true, element: <DashboardPage /> },
+        { index: true, element: <BreakdownPage /> },
         { path: 'game/:id', element: <GamePage /> },
         { path: 'breakdown', element: <BreakdownPage /> },
         { path: 'control', element: <ControlPage /> },
         { path: 'upcoming', element: <UpcomingPage /> },
         { path: 'players', element: <PlayersPage /> },
         { path: 'player/:name', element: <PlayerPage /> },
+        { path: 'admin', element: <AdminPage /> },
       ],
     },
   ],

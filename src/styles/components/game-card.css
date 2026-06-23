@@ -88,6 +88,86 @@
   font-weight: 400;
 }
 
+.game-card-score-editor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.game-card-score-editor input {
+  width: 60px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--input-bg, var(--card-bg));
+  color: var(--text);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.game-card-score-editor input:focus {
+  outline: none;
+  border-color: var(--accent-color, #0ea5e9);
+}
+
+.game-card-score-editor span {
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.game-card-enter-result-btn,
+.game-card-edit-btn {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--accent-color, #0ea5e9);
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.game-card-enter-result-btn:hover,
+.game-card-edit-btn:hover {
+  background: var(--accent-color-hover, #0284c7);
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-save {
+  background: var(--accent-color, #0ea5e9);
+  color: white;
+  border-color: var(--accent-color, #0ea5e9);
+}
+
+.btn-save:hover {
+  background: var(--accent-color-hover, #0284c7);
+}
+
+.btn-cancel {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btn-cancel:hover {
+  background: var(--accent-bg);
+}
+
 .predictions-table td {
   font-variant-numeric: tabular-nums;
 }

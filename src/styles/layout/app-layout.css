@@ -152,8 +152,9 @@
 .main-content {
   flex: 1;
   min-width: 0;
+  width: 100%;
   padding: 24px;
-  max-width: 1000px;
+  max-width: none;
   overflow-x: hidden;
   background:
     repeating-linear-gradient(
