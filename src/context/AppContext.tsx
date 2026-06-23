@@ -3,20 +3,48 @@ import type { ReactNode } from 'react';
 import type { Game, Prediction } from '../types';
 import { parseGames, parsePredictions } from '../utils/parseData';
 import { scoringSystems } from '../utils/scoring';
-import { loadGames, saveGames, loadPredictions, savePredictions, isAdminMode, setAdminMode } from '../utils/storage';
+import {
+  loadGames,
+  saveGames,
+  loadPredictions,
+  savePredictions,
+  isAdminMode,
+  setAdminMode,
+  loadSeedSignature,
+  saveSeedSignature,
+} from '../utils/storage';
 import { AppContext } from './appContextStore';
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const csvGames = useMemo(() => parseGames(), []);
+  const csvPredictions = useMemo(() => parsePredictions(), []);
+  const csvSeedSignature = useMemo(
+    () => JSON.stringify({ games: csvGames, predictions: csvPredictions }),
+    [csvGames, csvPredictions],
+  );
+
   // Initialize games from localStorage or CSV
   const [games, setGames] = useState<Game[]>(() => {
+    const storedSeedSignature = loadSeedSignature();
+    if (storedSeedSignature !== csvSeedSignature) {
+      saveSeedSignature(csvSeedSignature);
+      return csvGames;
+    }
+
     const stored = loadGames();
-    return stored || parseGames();
+    return stored || csvGames;
   });
 
   // Initialize predictions from localStorage or CSV
   const [predictions, setPredictions] = useState<Prediction[]>(() => {
+    const storedSeedSignature = loadSeedSignature();
+    if (storedSeedSignature !== csvSeedSignature) {
+      saveSeedSignature(csvSeedSignature);
+      return csvPredictions;
+    }
+
     const stored = loadPredictions();
-    return stored || parsePredictions();
+    return stored || csvPredictions;
   });
 
   // Admin mode is enabled by default; persisted value is respected once set.
@@ -77,9 +105,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resetData = useCallback(() => {
-    setGames(parseGames());
-    setPredictions(parsePredictions());
-  }, []);
+    setGames(csvGames);
+    setPredictions(csvPredictions);
+    saveSeedSignature(csvSeedSignature);
+  }, [csvGames, csvPredictions, csvSeedSignature]);
 
   const [selectedSystem, setSelectedSystem] = useState(scoringSystems[0]);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {

@@ -3,6 +3,7 @@ import type { Game, Prediction } from '../types';
 const GAMES_KEY = 'wc-games';
 const PREDICTIONS_KEY = 'wc-predictions';
 const ADMIN_MODE_KEY = 'wc-admin';
+const SEED_SIGNATURE_KEY = 'wc-seed-signature';
 
 export function loadGames(): Game[] | null {
   try {
@@ -45,4 +46,13 @@ export function setAdminMode(enabled: boolean): void {
 export function clearStorage(): void {
   localStorage.removeItem(GAMES_KEY);
   localStorage.removeItem(PREDICTIONS_KEY);
+  localStorage.removeItem(SEED_SIGNATURE_KEY);
+}
+
+export function loadSeedSignature(): string | null {
+  return localStorage.getItem(SEED_SIGNATURE_KEY);
+}
+
+export function saveSeedSignature(signature: string): void {
+  localStorage.setItem(SEED_SIGNATURE_KEY, signature);
 }
