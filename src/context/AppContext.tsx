@@ -22,12 +22,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     () => JSON.stringify({ games: csvGames, predictions: csvPredictions }),
     [csvGames, csvPredictions],
   );
+  const storedSeedSignature = useMemo(() => loadSeedSignature(), []);
+  const hasSeedChanged = storedSeedSignature !== csvSeedSignature;
 
   // Initialize games from localStorage or CSV
   const [games, setGames] = useState<Game[]>(() => {
-    const storedSeedSignature = loadSeedSignature();
-    if (storedSeedSignature !== csvSeedSignature) {
-      saveSeedSignature(csvSeedSignature);
+    if (hasSeedChanged) {
       return csvGames;
     }
 
@@ -37,15 +37,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Initialize predictions from localStorage or CSV
   const [predictions, setPredictions] = useState<Prediction[]>(() => {
-    const storedSeedSignature = loadSeedSignature();
-    if (storedSeedSignature !== csvSeedSignature) {
-      saveSeedSignature(csvSeedSignature);
+    if (hasSeedChanged) {
       return csvPredictions;
     }
 
     const stored = loadPredictions();
     return stored || csvPredictions;
   });
+
+  useEffect(() => {
+    if (hasSeedChanged) {
+      saveSeedSignature(csvSeedSignature);
+    }
+  }, [hasSeedChanged, csvSeedSignature]);
 
   // Admin mode is enabled by default; persisted value is respected once set.
   const [isAdmin, setIsAdminInternal] = useState(() => {

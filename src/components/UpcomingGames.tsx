@@ -11,6 +11,15 @@ interface UpcomingGamesProps {
 const GATES = ['A', 'B', 'C', 'D', 'E', 'F'];
 const ZONES = ['North', 'South', 'East', 'West', 'Club'];
 
+function isUnplayedGame(game: Game): boolean {
+  return (
+    game.homeScore === null ||
+    game.awayScore === null ||
+    Number.isNaN(game.homeScore) ||
+    Number.isNaN(game.awayScore)
+  );
+}
+
 function ticketMeta(gameId: number) {
   const gate = `Gate ${GATES[gameId % GATES.length]}`;
   const zone = `${ZONES[(gameId * 3) % ZONES.length]} ${100 + ((gameId * 7) % 90)}`;
@@ -43,7 +52,7 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
 
   // Find unplayed games that have predictions
   const upcomingGames = games
-    .filter((g) => g.homeScore === null)
+    .filter((g) => isUnplayedGame(g))
     .filter((g) => predictions.some((p) => p.gameId === g.id))
     .sort((a, b) => a.id - b.id);
 

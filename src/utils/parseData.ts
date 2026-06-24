@@ -14,6 +14,18 @@ import type { Game, Prediction } from '../types';
 import gamesRaw from '../data/games.csv?raw';
 import predictionsRaw from '../data/predictions.csv?raw';
 
+function parseNullableInt(value: string | undefined): number | null {
+  const normalized = (value ?? '').trim();
+  if (normalized === '') return null;
+  const parsed = Number.parseInt(normalized, 10);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function parseRequiredInt(value: string | undefined): number {
+  const normalized = (value ?? '').trim();
+  return Number.parseInt(normalized, 10);
+}
+
 /**
  * Parses the games CSV into typed {@link Game} objects.
  *
@@ -29,13 +41,15 @@ export function parseGames(): Game[] {
     skipEmptyLines: true,
   });
 
-  return (result.data as Record<string, string>[]).map((row) => ({
-    id: parseInt(row.id, 10),
-    home: row.home,
-    away: row.away,
-    homeScore: row.home_score !== '' ? parseInt(row.home_score, 10) : null,
-    awayScore: row.away_score !== '' ? parseInt(row.away_score, 10) : null,
-  }));
+  return (result.data as Record<string, string>[])
+    .map((row) => ({
+      id: parseRequiredInt(row.id),
+      home: (row.home ?? '').trim(),
+      away: (row.away ?? '').trim(),
+      homeScore: parseNullableInt(row.home_score),
+      awayScore: parseNullableInt(row.away_score),
+    }))
+    .filter((game) => Number.isFinite(game.id) && game.home !== '' && game.away !== '');
 }
 
 /**
@@ -53,10 +67,18 @@ export function parsePredictions(): Prediction[] {
     skipEmptyLines: true,
   });
 
-  return (result.data as Record<string, string>[]).map((row) => ({
-    name: row.name,
-    gameId: parseInt(row.game_id, 10),
-    homeScore: parseInt(row.home_score, 10),
-    awayScore: parseInt(row.away_score, 10),
-  }));
+  return (result.data as Record<string, string>[])
+    .map((row) => ({
+      name: (row.name ?? '').trim(),
+      gameId: parseRequiredInt(row.game_id),
+      homeScore: parseRequiredInt(row.home_score),
+      awayScore: parseRequiredInt(row.away_score),
+    }))
+    .filter(
+      (prediction) =>
+        prediction.name !== '' &&
+        Number.isFinite(prediction.gameId) &&
+        Number.isFinite(prediction.homeScore) &&
+        Number.isFinite(prediction.awayScore),
+    );
 }
