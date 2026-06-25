@@ -47,12 +47,12 @@ id;home;away;home_score;away_score
 46;England;Ghana;0;0
 47;Panama;Croatia;0;1
 48;Colombia;DR Congo;1;0
-49;Switzerland;Canada;;
-50;Bosnia and Herzegovina;Qatar;;
-51;Morocco;Haiti;;
-52;Scotland;Brazil;;
-53;South Africa;South Korea;;
-54;Czechia;Mexico;;
+49;Switzerland;Canada;2;1
+50;Bosnia and Herzegovina;Qatar;3;1
+51;Morocco;Haiti;4;2
+52;Scotland;Brazil;0;3
+53;South Africa;South Korea;1;0
+54;Czechia;Mexico;0;3
 55;Curacao;Ivory Coast;;
 56;Equador;Germany;;
 57;Tunisia;Netherlands;;

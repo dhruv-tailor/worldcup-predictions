@@ -31,8 +31,8 @@ function ticketMeta(gameId: number) {
 /**
  * Preview section showing player predictions for the next set of unplayed games.
  *
- * "Next set" = all unplayed games that have at least one prediction submitted.
- * Each game is rendered as a mini card with every player's predicted score.
+ * "Next set" = all unplayed games in fixture order.
+ * If a game has no submitted predictions yet, it is still shown with empty columns.
  */
 export default function UpcomingGames({ games, predictions }: UpcomingGamesProps) {
   const [showAll, setShowAll] = useState(false);
@@ -50,10 +50,9 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
     link.click();
   }, []);
 
-  // Find unplayed games that have predictions
+  // Always show unplayed games, even before predictions are submitted.
   const upcomingGames = games
     .filter((g) => isUnplayedGame(g))
-    .filter((g) => predictions.some((p) => p.gameId === g.id))
     .sort((a, b) => a.id - b.id);
 
   if (upcomingGames.length === 0) return null;

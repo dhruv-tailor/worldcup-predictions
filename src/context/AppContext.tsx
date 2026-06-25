@@ -15,6 +15,39 @@ import {
 } from '../utils/storage';
 import { AppContext } from './appContextStore';
 
+function isPlayedGame(game: Game): boolean {
+  return game.homeScore !== null && game.awayScore !== null;
+}
+
+function isUnplayedGame(game: Game): boolean {
+  return game.homeScore === null || game.awayScore === null;
+}
+
+function reconcileGamesWithCsv(storedGames: Game[], csvGames: Game[]): Game[] {
+  const csvById = new Map(csvGames.map((game) => [game.id, game]));
+
+  const merged = storedGames.map((storedGame) => {
+    const csvGame = csvById.get(storedGame.id);
+    if (!csvGame) return storedGame;
+
+    // Keep user edits by default, but if CSV now marks a game as played while
+    // stored data still has it unplayed, promote the CSV result.
+    if (isUnplayedGame(storedGame) && isPlayedGame(csvGame)) {
+      return {
+        ...storedGame,
+        homeScore: csvGame.homeScore,
+        awayScore: csvGame.awayScore,
+      };
+    }
+
+    return storedGame;
+  });
+
+  const storedIds = new Set(storedGames.map((game) => game.id));
+  const missingCsvGames = csvGames.filter((game) => !storedIds.has(game.id));
+  return [...merged, ...missingCsvGames].sort((a, b) => a.id - b.id);
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const csvGames = useMemo(() => parseGames(), []);
   const csvPredictions = useMemo(() => parsePredictions(), []);
@@ -32,7 +65,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     const stored = loadGames();
-    return stored || csvGames;
+    if (!stored) return csvGames;
+    return reconcileGamesWithCsv(stored, csvGames);
   });
 
   // Initialize predictions from localStorage or CSV
@@ -47,9 +81,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hasSeedChanged) {
+      setGames(csvGames);
+      setPredictions(csvPredictions);
       saveSeedSignature(csvSeedSignature);
     }
-  }, [hasSeedChanged, csvSeedSignature]);
+  }, [hasSeedChanged, csvGames, csvPredictions, csvSeedSignature]);
 
   // Admin mode is enabled by default; persisted value is respected once set.
   const [isAdmin, setIsAdminInternal] = useState(() => {
