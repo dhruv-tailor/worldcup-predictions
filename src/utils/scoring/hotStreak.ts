@@ -57,11 +57,11 @@ const hotStreak: ScoringSystem = {
         continue;
       }
 
-      const actualWinner = getWinner(game.homeScore, game.awayScore);
+      const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
 
       for (const prediction of gamePredictions) {
         const base = tedClassicRawScore(game, prediction);
-        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
         const correctWinner = predictedWinner === actualWinner;
 
         let streakBonus = 0;

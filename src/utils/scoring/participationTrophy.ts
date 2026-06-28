@@ -29,8 +29,8 @@ const baseCalculate = simpleScoring((game, prediction) => {
     };
   }
 
-  const actualWinner = getWinner(game.homeScore, game.awayScore);
-  const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+  const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
+  const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
 
   const winner = actualWinner === predictedWinner ? 2 : 0;
   const homeGoals = game.homeScore === prediction.homeScore ? 1 : 0;
@@ -38,7 +38,11 @@ const baseCalculate = simpleScoring((game, prediction) => {
   const goalDifference = (game.homeScore - game.awayScore) === (prediction.homeScore - prediction.awayScore) ? 1 : 0;
   const totalGoals = (game.homeScore + game.awayScore) === (prediction.homeScore + prediction.awayScore) ? 1 : 0;
   const withinOne = (Math.abs(game.homeScore - prediction.homeScore) <= 1 && Math.abs(game.awayScore - prediction.awayScore) <= 1) ? 1 : 0;
-  const exactScore = (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) ? 4 : 0;
+  const exactScore = (
+    game.homeScore === prediction.homeScore &&
+    game.awayScore === prediction.awayScore &&
+    (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+  ) ? 4 : 0;
 
   const total = winner + homeGoals + awayGoals + goalDifference + totalGoals + withinOne + exactScore;
 

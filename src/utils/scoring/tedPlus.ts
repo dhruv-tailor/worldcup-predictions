@@ -21,8 +21,8 @@ const baseCalculate = simpleScoring((game, prediction) => {
       return { categories: { winner: 0, goalDifference: 0, totalGoals: 0, exactScore: 0 }, total: 0 };
     }
 
-    const actualWinner = getWinner(game.homeScore, game.awayScore);
-    const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+    const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
+    const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
     const correctWinner = actualWinner === predictedWinner;
 
     // +2 for correct winner, +3 if correctly predicted a draw
@@ -34,7 +34,11 @@ const baseCalculate = simpleScoring((game, prediction) => {
     const predictedTotal = prediction.homeScore + prediction.awayScore;
     const totalGoals = actualTotal === predictedTotal ? 1 : 0;
 
-    const exactScore = (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) ? 2 : 0;
+    const exactScore = (
+      game.homeScore === prediction.homeScore &&
+      game.awayScore === prediction.awayScore &&
+      (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+    ) ? 2 : 0;
 
     return {
       categories: { winner, goalDifference, totalGoals, exactScore },

@@ -63,27 +63,27 @@ const blackSheep: ScoringSystem = {
 
       if (gamePredictions.length === 0) continue;
 
-      // Find the mode prediction (most common home-away pair).
+      // Find the mode prediction (most common home-away-homeWin triplet).
       // Ties broken by smallest error vs actual result.
-      const freqMap = new Map<string, { count: number; home: number; away: number }>();
+      const freqMap = new Map<string, { count: number; home: number; away: number; homeWin: 'W' | 'L' | null }>();
       for (const p of gamePredictions) {
-        const key = `${p.homeScore}-${p.awayScore}`;
+        const key = `${p.homeScore}-${p.awayScore}-${p.homeWin ?? ''}`;
         const entry = freqMap.get(key);
         if (entry) {
           entry.count++;
         } else {
-          freqMap.set(key, { count: 1, home: p.homeScore, away: p.awayScore });
+          freqMap.set(key, { count: 1, home: p.homeScore, away: p.awayScore, homeWin: p.homeWin ?? null });
         }
       }
-      let mode = { home: 0, away: 0 };
+      let mode = { home: 0, away: 0, homeWin: null as 'W' | 'L' | null };
       let bestCount = 0;
       let bestError = Infinity;
-      for (const { count, home, away } of freqMap.values()) {
+      for (const { count, home, away, homeWin } of freqMap.values()) {
         const error = Math.abs(home - game.homeScore!) + Math.abs(away - game.awayScore!);
         if (count > bestCount || (count === bestCount && error < bestError)) {
           bestCount = count;
           bestError = error;
-          mode = { home, away };
+          mode = { home, away, homeWin };
         }
       }
 
@@ -96,7 +96,11 @@ const blackSheep: ScoringSystem = {
         const rawEdge = crowdError - playerError;
 
         const edgePoints = Math.round(rawEdge * 2);
-        const isExact = game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore;
+        const isExact = (
+          game.homeScore === prediction.homeScore &&
+          game.awayScore === prediction.awayScore &&
+          (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+        );
         const bonus = isExact ? 1 : 0;
 
         playerMap.get(prediction.name)!.push({

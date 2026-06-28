@@ -20,6 +20,7 @@ export interface PlayerCardSummary {
   bestSystemRank: number;
   winnerPct: number;
   exactPct: number;
+  exactCount: number;
   avgError: number;
   homeAvgError: number;
   awayAvgError: number;
@@ -49,6 +50,7 @@ interface PerPlayerInterim {
   bestSystemRank: number;
   winnerPct: number;
   exactPct: number;
+  exactCount: number;
   avgError: number;
   homeAvgError: number;
   awayAvgError: number;
@@ -201,6 +203,7 @@ export function buildPlayerCardSummaries({
         bestSystemRank: totalPlayers,
         winnerPct: 0,
         exactPct: 0,
+        exactCount: 0,
         avgError: 0,
         homeAvgError: 0,
         awayAvgError: 0,
@@ -260,6 +263,7 @@ export function buildPlayerCardSummaries({
       bestSystemRank: bestSystem?.rank ?? totalPlayers,
       winnerPct: accuracy.winnerPct,
       exactPct: accuracy.exactPct,
+      exactCount: accuracy.exactCount,
       avgError: accuracy.avgError,
       homeAvgError: accuracy.homeAvgError,
       awayAvgError: accuracy.awayAvgError,
@@ -293,6 +297,7 @@ export function buildPlayerCardSummaries({
       bestSystemRank: entry.bestSystemRank,
       winnerPct: entry.winnerPct,
       exactPct: entry.exactPct,
+      exactCount: entry.exactCount,
       avgError: entry.avgError,
       homeAvgError: entry.homeAvgError,
       awayAvgError: entry.awayAvgError,

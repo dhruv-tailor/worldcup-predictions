@@ -20,9 +20,13 @@ const baseCalculate = simpleScoring((game, prediction) => {
       return { categories: { winner: 0, goalDifference: 0, exactScore: 0 }, total: 0 };
     }
 
-    const winner = getWinner(game.homeScore, game.awayScore) === getWinner(prediction.homeScore, prediction.awayScore) ? 2 : 0;
+    const winner = getWinner(game.homeScore, game.awayScore, game.homeWin) === getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin) ? 2 : 0;
     const goalDifference = (game.homeScore - game.awayScore) === (prediction.homeScore - prediction.awayScore) ? 1 : 0;
-    const exactScore = (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) ? 1 : 0;
+    const exactScore = (
+      game.homeScore === prediction.homeScore &&
+      game.awayScore === prediction.awayScore &&
+      (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+    ) ? 1 : 0;
 
     return {
       categories: { winner, goalDifference, exactScore },

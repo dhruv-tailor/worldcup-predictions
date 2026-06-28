@@ -129,7 +129,7 @@ export default function PlayerCard({ summary, index }: PlayerCardProps) {
           </div>
           <div className="player-card-namegroup">
             <h3>{summary.playerName}</h3>
-            <p className="player-card-name-metrics">#{summary.rank} · 🔥{summary.longestStreak}</p>
+            <p className="player-card-name-metrics">#{summary.rank} · 🔥{summary.longestStreak} · 🎯{summary.exactCount}</p>
           </div>
           <div className="player-card-ovr-badge" aria-label={`Overall ${displayPowerScore} ${displayPowerGrade}`}>
             <span className="player-card-ovr-label">OVR</span>

@@ -11,11 +11,19 @@ import type { Game, Prediction, PointBreakdown, PlayerScore, GameBreakdown } fro
 
 /**
  * Determines the match outcome from a pair of scores.
- * @returns 'home' if home wins, 'away' if away wins, 'draw' if tied
+ * When scores are level and the game went to a penalty shootout,
+ * pass `homeWin` to resolve to the actual winner.
+ * @returns 'home' if home wins, 'away' if away wins, 'draw' if tied with no shootout
  */
-export function getWinner(homeScore: number, awayScore: number): 'home' | 'away' | 'draw' {
+export function getWinner(
+  homeScore: number,
+  awayScore: number,
+  homeWin?: 'W' | 'L' | null,
+): 'home' | 'away' | 'draw' {
   if (homeScore > awayScore) return 'home';
   if (awayScore > homeScore) return 'away';
+  if (homeWin === 'W') return 'home';
+  if (homeWin === 'L') return 'away';
   return 'draw';
 }
 
@@ -77,13 +85,17 @@ export function tedClassicRawScore(game: Game, prediction: Prediction): number {
   if (game.homeScore === null || game.awayScore === null) return 0;
 
   let pts = 0;
-  if (getWinner(game.homeScore, game.awayScore) === getWinner(prediction.homeScore, prediction.awayScore)) {
+  if (getWinner(game.homeScore, game.awayScore, game.homeWin) === getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin)) {
     pts += 2;
   }
   if ((game.homeScore - game.awayScore) === (prediction.homeScore - prediction.awayScore)) {
     pts += 1;
   }
-  if (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) {
+  if (
+    game.homeScore === prediction.homeScore &&
+    game.awayScore === prediction.awayScore &&
+    (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+  ) {
     pts += 1;
   }
   return pts;
@@ -107,8 +119,8 @@ export function tedPlusRawScore(game: Game, prediction: Prediction): number {
   if (game.homeScore === null || game.awayScore === null) return 0;
 
   let pts = 0;
-  const actualWinner = getWinner(game.homeScore, game.awayScore);
-  const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+  const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
+  const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
   if (actualWinner === predictedWinner) {
     pts += actualWinner === 'draw' ? 3 : 2;
   }
@@ -118,7 +130,11 @@ export function tedPlusRawScore(game: Game, prediction: Prediction): number {
   if ((game.homeScore + game.awayScore) === (prediction.homeScore + prediction.awayScore)) {
     pts += 1;
   }
-  if (game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore) {
+  if (
+    game.homeScore === prediction.homeScore &&
+    game.awayScore === prediction.awayScore &&
+    (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+  ) {
     pts += 2;
   }
   return pts;

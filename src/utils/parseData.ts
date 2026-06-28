@@ -14,6 +14,13 @@ import type { Game, Prediction } from '../types';
 import gamesRaw from '../data/games.csv?raw';
 import predictionsRaw from '../data/predictions.csv?raw';
 
+function parseHomeWin(value: string | undefined): 'W' | 'L' | null {
+  const normalized = (value ?? '').trim();
+  if (normalized === 'W') return 'W';
+  if (normalized === 'L') return 'L';
+  return null;
+}
+
 function parseNullableInt(value: string | undefined): number | null {
   const normalized = (value ?? '').trim();
   if (normalized === '') return null;
@@ -48,6 +55,7 @@ export function parseGames(): Game[] {
       away: (row.away ?? '').trim(),
       homeScore: parseNullableInt(row.home_score),
       awayScore: parseNullableInt(row.away_score),
+      homeWin: parseHomeWin(row.home_win),
     }))
     .filter((game) => Number.isFinite(game.id) && game.home !== '' && game.away !== '');
 }
@@ -73,6 +81,7 @@ export function parsePredictions(): Prediction[] {
       gameId: parseRequiredInt(row.game_id),
       homeScore: parseRequiredInt(row.home_score),
       awayScore: parseRequiredInt(row.away_score),
+      homeWin: parseHomeWin(row.home_win),
     }))
     .filter(
       (prediction) =>

@@ -61,16 +61,16 @@ const gamblers: ScoringSystem = {
 
       const gamePredictions = predictions.filter((p) => p.gameId === game.id);
       const totalPlayers = gamePredictions.length;
-      const actualWinner = getWinner(game.homeScore, game.awayScore);
+      const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
 
       // Count how many players predicted each outcome (home win, away win, draw)
       const outcomeCounts = { home: 0, away: 0, draw: 0 };
       for (const p of gamePredictions) {
-        outcomeCounts[getWinner(p.homeScore, p.awayScore)]++;
+        outcomeCounts[getWinner(p.homeScore, p.awayScore, p.homeWin)]++;
       }
 
       for (const prediction of gamePredictions) {
-        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
         const correct = predictedWinner === actualWinner;
         const sameOutcomeCount = outcomeCounts[predictedWinner];
         const multiplier = totalPlayers / sameOutcomeCount;
@@ -91,7 +91,11 @@ const gamblers: ScoringSystem = {
         // Uniqueness multiplier: ratio of total players to those who picked the same outcome
         // Base points: +1 for correct winner, +2 bonus for exact score match
         let base = 1;
-        const isExact = game.homeScore === prediction.homeScore && game.awayScore === prediction.awayScore;
+        const isExact = (
+          game.homeScore === prediction.homeScore &&
+          game.awayScore === prediction.awayScore &&
+          (game.homeScore !== game.awayScore || game.homeWin === prediction.homeWin)
+        );
         if (isExact) base += 2;
 
         // Apply multiplier: boosted = round(base × multiplier), bonus = boosted − base

@@ -55,13 +55,13 @@ const fiveDollarBets: ScoringSystem = {
       const gamePredictions = predictions.filter((p) => p.gameId === game.id);
       if (gamePredictions.length === 0) continue;
 
-      const actualWinner = getWinner(game.homeScore, game.awayScore);
+      const actualWinner = getWinner(game.homeScore, game.awayScore, game.homeWin);
       const pool = gamePredictions.length * BET_AMOUNT;
 
       // Find who predicted the correct winner
       const winners: Prediction[] = [];
       for (const prediction of gamePredictions) {
-        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore);
+        const predictedWinner = getWinner(prediction.homeScore, prediction.awayScore, prediction.homeWin);
         if (predictedWinner === actualWinner) {
           winners.push(prediction);
         }

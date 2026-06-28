@@ -13,6 +13,11 @@ export interface Game {
   homeScore: number | null;
   /** Away team's final score, or null if the game hasn't been played */
   awayScore: number | null;
+  /**
+   * Penalty shootout result, only set when the game ended in a draw and went to penalties.
+   * 'W' = home team won the shootout, 'L' = home team lost.
+   */
+  homeWin?: 'W' | 'L' | null;
 }
 
 /**
@@ -27,6 +32,11 @@ export interface Prediction {
   homeScore: number;
   /** Predicted away team score */
   awayScore: number;
+  /**
+   * Predicted penalty shootout winner, only relevant when predicting a draw score.
+   * 'W' = home team wins the shootout, 'L' = home team loses.
+   */
+  homeWin?: 'W' | 'L' | null;
 }
 
 /**
