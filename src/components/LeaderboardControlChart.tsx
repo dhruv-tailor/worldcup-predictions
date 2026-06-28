@@ -26,6 +26,21 @@ interface EraSegment {
   type: 'stable' | 'chaotic';
   playerName?: string;
   isGoldenAge?: boolean;
+  /** 1-based index of this player's stable eras (used for Roman numeral suffix) */
+  dynastyIndex?: number;
+}
+
+function toRoman(n: number): string {
+  const numerals: [number, string][] = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ];
+  let result = '';
+  for (const [value, numeral] of numerals) {
+    while (n >= value) { result += numeral; n -= value; }
+  }
+  return result;
 }
 
 const COLORS = [
@@ -106,6 +121,8 @@ function computeEras(
 ): EraSegment[] {
   const computedEras: EraSegment[] = [];
   const stableThreshold = Math.floor(systemCount / 2) + 1;
+  // Track how many distinct stable eras each player has started (for dynastyIndex)
+  const playerDynastyIndex = new Map<string, number>();
 
   for (const entry of data) {
     const gameId = Number(entry.gameId);
@@ -120,37 +137,56 @@ function computeEras(
 
     const isStable = controllersAboveThreshold.length === 1;
     const stablePlayer = isStable ? controllersAboveThreshold[0] : undefined;
-    const label = isStable ? labels.stable(stablePlayer!) : labels.chaotic;
 
     const previous = computedEras[computedEras.length - 1];
-    if (!previous) {
-      computedEras.push({
-        label,
-        startGameId: gameId,
-        endGameId: gameId,
-        type: isStable ? 'stable' : 'chaotic',
-        playerName: stablePlayer,
-        isGoldenAge: false,
-      });
-      continue;
-    }
 
     const sameEra =
+      !!previous &&
       previous.type === (isStable ? 'stable' : 'chaotic') &&
       ((isStable && previous.playerName === stablePlayer) || (!isStable && !previous.playerName));
 
     if (sameEra) {
       previous.endGameId = gameId;
     } else {
+      let dynastyIndex: number | undefined;
+      if (isStable && stablePlayer) {
+        const idx = (playerDynastyIndex.get(stablePlayer) ?? 0) + 1;
+        playerDynastyIndex.set(stablePlayer, idx);
+        dynastyIndex = idx;
+      }
       computedEras.push({
-        label,
+        label: isStable ? labels.stable(stablePlayer!) : labels.chaotic,
         startGameId: gameId,
         endGameId: gameId,
         type: isStable ? 'stable' : 'chaotic',
         playerName: stablePlayer,
         isGoldenAge: false,
+        dynastyIndex,
       });
     }
+  }
+
+  // Count total stable eras per player to decide whether to apply Roman numeral suffixes
+  const totalDynasties = new Map<string, number>();
+  for (const era of computedEras) {
+    if (era.type === 'stable' && era.playerName) {
+      totalDynasties.set(era.playerName, (totalDynasties.get(era.playerName) ?? 0) + 1);
+    }
+  }
+
+  // Helper: build the display name with optional Roman numeral suffix
+  const displayName = (playerName: string, dynastyIndex: number | undefined): string => {
+    const total = totalDynasties.get(playerName) ?? 1;
+    if (total > 1 && dynastyIndex !== undefined) {
+      return `${playerName} ${toRoman(dynastyIndex)}`;
+    }
+    return playerName;
+  };
+
+  // Update stable era labels now that we know total dynasty counts
+  for (const era of computedEras) {
+    if (era.type !== 'stable' || !era.playerName) continue;
+    era.label = labels.stable(displayName(era.playerName, era.dynastyIndex));
   }
 
   // Promote to Golden Age if dynasty player achieved full control at any point
@@ -165,7 +201,7 @@ function computeEras(
     });
 
     if (hadFullControl) {
-      era.label = labels.goldenAge(playerName);
+      era.label = labels.goldenAge(displayName(playerName, era.dynastyIndex));
       era.isGoldenAge = true;
     }
   }
