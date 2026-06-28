@@ -1,4 +1,10 @@
 /* Leaderboard Control Chart: Warring States theme */
+.control-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
 .leaderboard-control-chart {
   position: relative;
   margin-bottom: 32px;
