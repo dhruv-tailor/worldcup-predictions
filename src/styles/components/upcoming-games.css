@@ -282,6 +282,10 @@
   border-top: 1px solid rgba(37, 50, 69, 0.18);
 }
 
+.upcoming-columns-no-draw {
+  grid-template-columns: 1fr 1fr;
+}
+
 .upcoming-col {
   padding: 0;
   border-right: 1px solid rgba(37, 50, 69, 0.2);

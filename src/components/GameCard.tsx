@@ -4,6 +4,7 @@ import type { Game, PlayerScore, ScoringSystem } from '../types';
 import { useAppContext } from '../context/useAppContext';
 import { getFlag, getGameLabel } from '../utils/flags';
 import { createBarcodePattern } from '../utils/barcode';
+import { getWinner } from '../utils/scoring/helpers';
 
 interface GameCardProps {
   game: Game;
@@ -21,12 +22,6 @@ function ticketRef(name: string, gameId: number) {
     .join('');
   const suffix = String((name.length * 137 + gameId * 97) % 10000).padStart(4, '0');
   return `${initials}${String(gameId).padStart(3, '0')}-${suffix}`;
-}
-
-function pickWinner(home: number, away: number): 'home' | 'away' | 'draw' {
-  if (home > away) return 'home';
-  if (away > home) return 'away';
-  return 'draw';
 }
 
 function ticketExtras(name: string, gameId: number) {
@@ -173,13 +168,20 @@ export default function GameCard({ game, games, standings, system }: GameCardPro
         {predictions.map((p) => {
           const ticketKey = `${game.id}-${p!.name}`;
           const extras = ticketExtras(p!.name, game.id);
-          const predictedWinner = pickWinner(p!.prediction.homeScore, p!.prediction.awayScore);
-          const actualWinner = isPlayed ? pickWinner(game.homeScore!, game.awayScore!) : null;
+          const predictedWinner = getWinner(
+            p!.prediction.homeScore,
+            p!.prediction.awayScore,
+            p!.prediction.homeWin,
+          );
+          const actualWinner = isPlayed
+            ? getWinner(game.homeScore!, game.awayScore!, game.homeWin)
+            : null;
           const isOutcomeHit = isPlayed && predictedWinner === actualWinner;
           const isExact =
             isPlayed &&
             p!.prediction.homeScore === game.homeScore &&
-            p!.prediction.awayScore === game.awayScore;
+            p!.prediction.awayScore === game.awayScore &&
+            (game.homeScore !== game.awayScore || p!.prediction.homeWin === game.homeWin);
 
           return (
             <article

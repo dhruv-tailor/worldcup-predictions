@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import type { Game, Prediction } from '../types';
 import { getFlag } from '../utils/flags';
 import { createBarcodePattern } from '../utils/barcode';
+import { getWinner } from '../utils/scoring/helpers';
 
 interface UpcomingGamesProps {
   games: Game[];
@@ -89,9 +90,16 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
             a.name.localeCompare(b.name)
           );
           const meta = ticketMeta(game.id);
-          const homeWins = gamePreds.filter((p) => p.homeScore > p.awayScore);
-          const draws = gamePreds.filter((p) => p.homeScore === p.awayScore);
-          const awayWins = gamePreds.filter((p) => p.awayScore > p.homeScore);
+          const homeWins = gamePreds.filter(
+            (p) => getWinner(p.homeScore, p.awayScore, p.homeWin) === 'home'
+          );
+          const draws = gamePreds.filter(
+            (p) => getWinner(p.homeScore, p.awayScore, p.homeWin) === 'draw'
+          );
+          const awayWins = gamePreds.filter(
+            (p) => getWinner(p.homeScore, p.awayScore, p.homeWin) === 'away'
+          );
+          const showDrawColumn = draws.length > 0;
           return (
             <article
               key={game.id}
@@ -118,7 +126,7 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
                 <span>Match {game.id}</span>
               </div>
               <div className="ticket-perf" aria-hidden="true" />
-              <div className="upcoming-columns ticket-columns">
+              <div className={`upcoming-columns ticket-columns ${showDrawColumn ? '' : 'upcoming-columns-no-draw'}`}>
                 <div className="upcoming-col">
                   <div className="upcoming-col-header">{getFlag(game.home)} Win</div>
                   {homeWins.length > 0 ? homeWins.map((p) => (
@@ -130,17 +138,19 @@ export default function UpcomingGames({ games, predictions }: UpcomingGamesProps
                     </div>
                   )) : <div className="upcoming-empty">—</div>}
                 </div>
-                <div className="upcoming-col">
-                  <div className="upcoming-col-header">🤝 Draw</div>
-                  {draws.length > 0 ? draws.map((p) => (
-                    <div key={p.name} className="upcoming-pred ticket-line-item">
-                      <span className="upcoming-player-wrap">
-                        <span className="upcoming-player">{p.name}</span>
-                      </span>
-                      <span className="upcoming-score">{p.homeScore}–{p.awayScore}</span>
-                    </div>
-                  )) : <div className="upcoming-empty">—</div>}
-                </div>
+                {showDrawColumn && (
+                  <div className="upcoming-col">
+                    <div className="upcoming-col-header">🤝 Draw</div>
+                    {draws.map((p) => (
+                      <div key={p.name} className="upcoming-pred ticket-line-item">
+                        <span className="upcoming-player-wrap">
+                          <span className="upcoming-player">{p.name}</span>
+                        </span>
+                        <span className="upcoming-score">{p.homeScore}–{p.awayScore}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="upcoming-col">
                   <div className="upcoming-col-header">{getFlag(game.away)} Win</div>
                   {awayWins.length > 0 ? awayWins.map((p) => (
