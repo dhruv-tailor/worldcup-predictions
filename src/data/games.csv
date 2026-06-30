@@ -75,7 +75,7 @@ id;home;away;home_score;away_score;home_win
 74;Brazil;Japan;2;1
 75;Germany;Paraguay;1;1;L
 76;Netherlands;Morocco;1;1;L
-77;Ivory Coast;Norway;;
+77;Ivory Coast;Norway;1;2
 78;France;Sweden;;
 79;Mexico;Ecuador;;
 80;England;DR Congo;;
@@ -87,3 +87,4 @@ id;home;away;home_score;away_score;home_win
 86;Australia;Egypt;;
 87;Argentina;Cabo Verde;;
 88;Colombia;Ghana;;
+89;Canada;Morocco;;
