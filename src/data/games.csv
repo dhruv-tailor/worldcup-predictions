@@ -78,7 +78,7 @@ id;home;away;home_score;away_score;home_win
 77;Ivory Coast;Norway;1;2
 78;France;Sweden;3;0
 79;Mexico;Ecuador;2;0
-80;England;DR Congo;;
+80;England;DR Congo;2;1
 81;Belgium;Senegal;;
 82;USA;Bosnia and Herzegovina;;
 83;Spain;Austria;;
@@ -88,3 +88,6 @@ id;home;away;home_score;away_score;home_win
 87;Argentina;Cabo Verde;;
 88;Colombia;Ghana;;
 89;Canada;Morocco;;
+90;Paraguay;France;;
+91;Brazil;Norway;;
+92;Mexico;England;;
