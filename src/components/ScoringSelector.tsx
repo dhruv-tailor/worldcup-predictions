@@ -21,6 +21,7 @@ export default function ScoringSelector({ systems, selected, onSelect }: Scoring
   const systemEmoji = (name: string) => {
     if (name === 'Ted Classic') return '🎯';
     if (name === 'Ted+') return '⭐';
+    if (name === 'Ted28') return '🧭';
     if (name === "Gambler's") return '🎰';
     if (name === '$5 Bets') return '💵';
     if (name === 'Ladder') return '🪜';

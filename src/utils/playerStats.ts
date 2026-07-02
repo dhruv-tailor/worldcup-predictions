@@ -175,6 +175,7 @@ export function getCrossSystemRanks(
     let keyStat = '-';
     if (system.name === 'Ted Classic' && player?.winnerPct != null) keyStat = `${player.winnerPct}% win`;
     else if (system.name === 'Ted+' && player?.perfectCount != null) keyStat = `${player.perfectCount} perfect`;
+    else if (system.name === 'Ted28' && player?.perfectCount != null) keyStat = `${player.perfectCount} perfect`;
     else if (system.name === "Gambler's" && player?.bestMultiplier != null) keyStat = `best x${player.bestMultiplier}`;
     else if (system.name === 'Ladder' && player?.peakRating != null) keyStat = `peak ${player.peakRating}`;
     else if (system.name === 'Hot Streak' && player?.longestStreak != null) keyStat = `best ${player.longestStreak}`;

@@ -1,6 +1,6 @@
 # World Cup Predictions
 
-A React app for tracking and scoring World Cup prediction competitions among friends. Supports 7 different scoring systems — from simple point-based to ELO ratings — with a live leaderboard, per-game breakdowns, and a score-over-time chart.
+A React app for tracking and scoring World Cup prediction competitions among friends. Supports 10 scoring systems — from simple point-based to ELO ratings — with a live leaderboard, per-game breakdowns, and a score-over-time chart.
 
 ## Tech Stack
 
@@ -46,11 +46,14 @@ Didi;1;3;0
 |--------|------|-------------|
 | **Ted Classic** | Simple | +2 correct winner, +1 goal difference, +1 exact score (max 4) |
 | **Ted+** | Simple | Enhanced: +2/+3 winner (draws harder), +1 GD, +1 total goals, +2 exact (max 7) |
+| **Ted28** | Simple | +1 tendency, home/away +1 within one (+2 exact), +1 GD, +1 exact result (max 7) |
 | **Gambler's** | Context-Aware | Uniqueness multiplier — bold predictions score more |
+| **$5 Bets** | Context-Aware | Every prediction antes $5 and correct-winner picks split the pot |
+| **Participation Trophy** | Simple | Rewards partial matches heavily, including closeness and exact jackpot |
 | **Ladder (ELO)** | Stateful | Chess-style ELO ratings, pairwise head-to-head per game |
 | **Hot Streak** | Stateful | Ted Classic base + escalating bonus for consecutive correct winners |
-| **Equal Aggregate** | Meta | Min-max normalized average across all 5 base systems |
-| **Weighted Aggregate** | Meta | Weighted normalized average (Gam ×2, Lad ×1.5, HS ×1.5, TC ×1, T+ ×1) |
+| **Equal Aggregate** | Meta | Min-max normalized average across all 8 base systems |
+| **Weighted Aggregate** | Meta | Weighted normalized average (Gam ×2, BS ×1.5, Lad ×1.5, HS ×1.5, TC/T+/T28/PT ×1) |
 
 ## Adding a Scoring System
 

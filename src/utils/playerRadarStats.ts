@@ -68,6 +68,7 @@ interface PerPlayerInterim {
 const systemLabelMap: Record<string, string> = {
   'Ted Classic': 'Classic',
   'Ted+': 'Ted+',
+  'Ted28': 'Ted28',
   "Gambler's": 'Gambler',
   '$5 Bets': '$5 Bets',
   Ladder: 'Ladder',
@@ -93,7 +94,7 @@ function resolveArchetype(radar: PlayerRadarDatum[]): string {
   const secondarySystem = sorted[1]?.systemName ?? '';
   const topValue = sorted[0]?.value ?? 0;
 
-  if (topSystem === 'Ted+' || topSystem === 'Participation Trophy') return 'The Sniper';
+  if (topSystem === 'Ted+' || topSystem === 'Ted28' || topSystem === 'Participation Trophy') return 'The Sniper';
   if (topSystem === "Gambler's" || topSystem === '$5 Bets') return 'The Maverick';
   if (topSystem === 'Ladder') return 'The Climber';
   if (topSystem === 'Hot Streak') return 'The Heater';
@@ -109,6 +110,7 @@ function keyStatForSystem(systemName: string, player: PlayerScore | undefined): 
 
   if (systemName === 'Ted Classic' && player.winnerPct != null) return `${player.winnerPct}% win`;
   if (systemName === 'Ted+' && player.perfectCount != null) return `${player.perfectCount} perfect`;
+  if (systemName === 'Ted28' && player.perfectCount != null) return `${player.perfectCount} perfect`;
   if (systemName === "Gambler's" && player.bestMultiplier != null) return `best x${player.bestMultiplier}`;
   if (systemName === 'Ladder' && player.peakRating != null) return `peak ${player.peakRating}`;
   if (systemName === 'Hot Streak' && player.longestStreak != null) return `best ${player.longestStreak}`;

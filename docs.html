@@ -208,7 +208,7 @@
     <!-- ============================================================ -->
     <h2 id="scoring-systems">Scoring Systems</h2>
     <p>
-      The app ships with seven base scoring systems plus two aggregate (meta) systems. Each takes the same input — a list
+      The app ships with eight base scoring systems plus two aggregate (meta) systems. Each takes the same input — a list
       of games and predictions — and produces a leaderboard. Switch between them
       using the dropdown at the top of the app.
     </p>
@@ -228,6 +228,26 @@
       <div class="example">
         <strong>Example:</strong> Actual: Mexico 2–1 South Africa. You predicted 2–1.
         → Winner ✓ (+2), GD ✓ (+1), Exact ✓ (+1) = <strong>4 points</strong>
+      </div>
+    </div>
+
+    <!-- Ted28 -->
+    <div class="scoring-card">
+      <h3>Ted28 <span class="badge badge-simple">Simple</span> <span class="max-pts">Max 7 pts/game</span></h3>
+      <p>Balanced partial-credit model that rewards closeness on each team score, even when tendency is wrong.</p>
+      <table>
+        <thead><tr><th>Category</th><th>Points</th><th>Condition</th></tr></thead>
+        <tbody>
+          <tr><td>Tendency</td><td>+1</td><td>Correctly predicted home win, away win, or draw</td></tr>
+          <tr><td>Home Goals</td><td>+1 / +2</td><td>+1 within one goal, +2 exact</td></tr>
+          <tr><td>Away Goals</td><td>+1 / +2</td><td>+1 within one goal, +2 exact</td></tr>
+          <tr><td>Goal Difference</td><td>+1</td><td>Predicted goal difference matches actual</td></tr>
+          <tr><td>Exact Result</td><td>+1</td><td>Entire result is correct (including shootout winner for draw scorelines)</td></tr>
+        </tbody>
+      </table>
+      <div class="example">
+        <strong>Example:</strong> Actual: 2–1. You predicted 1–2.
+        → Tendency ✗ (+0), Home within one (+1), Away within one (+1), GD ✗ (+0), Exact ✗ (+0) = <strong>2 points</strong>
       </div>
     </div>
 

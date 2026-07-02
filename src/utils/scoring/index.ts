@@ -12,6 +12,7 @@ import type { ScoringSystem } from '../../types';
 
 import tedClassic from './tedClassic';
 import tedPlus from './tedPlus';
+import ted28 from './ted28';
 import gamblers from './gamblers';
 import fiveDollarBets from './fiveDollarBets';
 import ladder from './ladder';
@@ -24,6 +25,7 @@ import weightedAggregate from './weightedAggregate';
 export const scoringSystems: ScoringSystem[] = [
   tedClassic,
   tedPlus,
+  ted28,
   gamblers,
   fiveDollarBets,
   ladder,

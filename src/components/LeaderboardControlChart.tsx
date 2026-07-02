@@ -440,7 +440,7 @@ export default function LeaderboardControlChart({ games, predictions }: Leaderbo
     <div className="control-sections">
       <ControlSection
         title="戰國 The Warring States"
-        subtitle="A chronicle of dominance across nine kingdoms"
+        subtitle={`A chronicle of dominance across ${scoringSystems.length} kingdoms`}
         chartData={chartData1st}
         eras={eras1st}
         playerNames={playerNames}

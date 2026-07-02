@@ -77,11 +77,11 @@ export interface PlayerScore {
   currentStreak?: number;
   /** Longest consecutive correct-winner streak achieved (Hot Streak only) */
   longestStreak?: number;
-  /** Number of exact score predictions (Ted Classic, Ted+) */
+  /** Number of exact score/result predictions (Ted Classic, Ted+, Ted28) */
   exactCount?: number;
   /** Percentage of played games with correct winner prediction (Ted Classic) */
   winnerPct?: number;
-  /** Number of games scoring maximum points (Ted+) */
+  /** Number of games scoring maximum points (Ted+, Ted28, Participation Trophy) */
   perfectCount?: number;
   /** Highest uniqueness multiplier achieved on a correct prediction (Gambler's) */
   bestMultiplier?: number;

@@ -19,6 +19,7 @@
 import type { Game, Prediction, ScoringSystem, PlayerScore, GameBreakdown } from '../../types';
 import tedClassic from './tedClassic';
 import tedPlus from './tedPlus';
+import ted28 from './ted28';
 import gamblers from './gamblers';
 import fiveDollarBets from './fiveDollarBets';
 import ladder from './ladder';
@@ -26,7 +27,7 @@ import hotStreak from './hotStreak';
 import participationTrophy from './participationTrophy';
 
 /** Base scoring systems to aggregate */
-const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, fiveDollarBets, ladder, hotStreak, participationTrophy];
+const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, ted28, gamblers, fiveDollarBets, ladder, hotStreak, participationTrophy];
 
 /**
  * Weights for each base system (same order as `baseSystems`).
@@ -36,6 +37,7 @@ const baseSystems: ScoringSystem[] = [tedClassic, tedPlus, gamblers, fiveDollarB
 const weights: number[] = [
   1.0,  // Ted Classic
   1.0,  // Ted+
+  1.0,  // Ted28
   2.0,  // Gambler's — rewards bold predictions
   1.5,  // Black Sheep — rewards individual insight
   1.5,  // Ladder (ELO) — competitive pairwise ranking
@@ -49,6 +51,7 @@ const totalWeight = weights.reduce((a, b) => a + b, 0);
 const systemLabels: { key: string; label: string }[] = [
   { key: 'tc', label: 'Ted Classic' },
   { key: 'tp', label: 'Ted+' },
+  { key: 't28', label: 'Ted28' },
   { key: 'gam', label: "Gambler's" },
   { key: 'bs', label: 'Black Sheep' },
   { key: 'lad', label: 'Ladder' },

@@ -139,6 +139,8 @@ export default function Leaderboard({ standings, games, system }: LeaderboardPro
             {sysName === 'Ted Classic' && <th className="stat-col" title="Correct winner percentage">Win%</th>}
             {sysName === 'Ted+' && <th className="stat-col" title="Exact score predictions">🎯</th>}
             {sysName === 'Ted+' && <th className="stat-col" title="Perfect games (7 pts)">⭐</th>}
+            {sysName === 'Ted28' && <th className="stat-col" title="Exact result predictions">🎯</th>}
+            {sysName === 'Ted28' && <th className="stat-col" title="Perfect games (7 pts)">⭐</th>}
             {sysName === "Gambler's" && <th className="stat-col" title="Best multiplier">Best×</th>}
             {sysName === "Gambler's" && <th className="stat-col" title="Average multiplier">Avg×</th>}
             {sysName === '$5 Bets' && <th className="stat-col" title="Correct winner percentage">Win%</th>}
@@ -199,6 +201,8 @@ export default function Leaderboard({ standings, games, system }: LeaderboardPro
                 {sysName === 'Ted Classic' && <td className="stat-col">{player.winnerPct != null ? `${player.winnerPct}%` : '-'}</td>}
                 {sysName === 'Ted+' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
                 {sysName === 'Ted+' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
+                {sysName === 'Ted28' && <td className="stat-col">{player.exactCount ?? '-'}</td>}
+                {sysName === 'Ted28' && <td className="stat-col">{player.perfectCount ?? '-'}</td>}
                 {sysName === "Gambler's" && <td className="stat-col">{player.bestMultiplier ? `×${player.bestMultiplier}` : '-'}</td>}
                 {sysName === "Gambler's" && <td className="stat-col">{player.avgMultiplier ? `×${player.avgMultiplier}` : '-'}</td>}
                 {sysName === '$5 Bets' && <td className="stat-col">{player.winnerPct != null ? `${player.winnerPct}%` : '-'}</td>}
