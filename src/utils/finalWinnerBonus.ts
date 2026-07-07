@@ -1,7 +1,7 @@
 import type { FinalWinnerPrediction, Game, PlayerScore } from '../types';
 import { getWinner } from './scoring/helpers';
 
-const FINAL_WINNER_POOL_PCT = 0.15;
+const FINAL_WINNER_POOL_PCT = 0.20;
 
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
