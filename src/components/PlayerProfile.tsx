@@ -14,6 +14,7 @@ import { getGameLabelShort } from '../utils/flags';
 
 interface PlayerProfileProps {
   player: PlayerScore;
+  standings: PlayerScore[];
   games: Game[];
   predictions: Prediction[];
   selectedSystem: ScoringSystem;
@@ -22,6 +23,7 @@ interface PlayerProfileProps {
 
 export default function PlayerProfile({
   player,
+  standings,
   games,
   predictions,
   selectedSystem,
@@ -30,7 +32,7 @@ export default function PlayerProfile({
   const accuracy = getPlayerAccuracy(player, games);
   const history = getPlayerGameHistory(player, games);
   const crossSystem = getCrossSystemRanks(player.name, games, predictions, systems);
-  const rank = selectedSystem.calculateStandings(games, predictions).findIndex((p) => p.name === player.name) + 1;
+  const rank = standings.findIndex((p) => p.name === player.name) + 1;
   const rankLabel = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
   const initials = player.name
     .split(' ')
@@ -63,6 +65,10 @@ export default function PlayerProfile({
       <section className="player-section player-metrics-grid">
         <div className="metric-card"><div className="label">Rank</div><div className="value">#{rank}</div></div>
         <div className="metric-card"><div className="label">Total Points</div><div className="value">{player.totalPoints}</div></div>
+        <div className="metric-card"><div className="label">Base Points</div><div className="value">{player.basePoints ?? player.totalPoints}</div></div>
+        <div className="metric-card"><div className="label">Final Bonus</div><div className="value">{player.finalWinnerBonus ?? 0}</div></div>
+        <div className="metric-card"><div className="label">Champion Pick</div><div className="value">{player.finalWinnerPick ?? '-'}</div></div>
+        <div className="metric-card"><div className="label">Champion Hit</div><div className="value">{player.pickedChampion ? 'Yes' : 'No'}</div></div>
         <div className="metric-card"><div className="label">Winner %</div><div className="value">{accuracy.winnerPct}%</div></div>
         <div className="metric-card"><div className="label">Exact %</div><div className="value">{accuracy.exactPct}%</div></div>
         <div className="metric-card"><div className="label">Avg Error</div><div className="value">{accuracy.avgError}</div></div>

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Game, Prediction } from '../types';
-import { parseGames, parsePredictions } from '../utils/parseData';
+import { parseFinalWinnerPredictions, parseGames, parsePredictions } from '../utils/parseData';
 import { scoringSystems } from '../utils/scoring';
+import { applyFinalWinnerBonus, resolveChampionNation } from '../utils/finalWinnerBonus';
 import {
   loadGames,
   saveGames,
@@ -51,9 +52,10 @@ function reconcileGamesWithCsv(storedGames: Game[], csvGames: Game[]): Game[] {
 export function AppProvider({ children }: { children: ReactNode }) {
   const csvGames = useMemo(() => parseGames(), []);
   const csvPredictions = useMemo(() => parsePredictions(), []);
+  const finalWinnerPredictions = useMemo(() => parseFinalWinnerPredictions(), []);
   const csvSeedSignature = useMemo(
-    () => JSON.stringify({ games: csvGames, predictions: csvPredictions }),
-    [csvGames, csvPredictions],
+    () => JSON.stringify({ games: csvGames, predictions: csvPredictions, finalWinnerPredictions }),
+    [csvGames, csvPredictions, finalWinnerPredictions],
   );
   const storedSeedSignature = useMemo(() => loadSeedSignature(), []);
   const hasSeedChanged = storedSeedSignature !== csvSeedSignature;
@@ -161,8 +163,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const standings = useMemo(
-    () => selectedSystem.calculateStandings(games, predictions),
-    [games, predictions, selectedSystem],
+    () => {
+      const rawStandings = selectedSystem.calculateStandings(games, predictions);
+      const championNation = resolveChampionNation(games);
+      return applyFinalWinnerBonus(rawStandings, finalWinnerPredictions, championNation);
+    },
+    [games, predictions, selectedSystem, finalWinnerPredictions],
   );
 
   return (

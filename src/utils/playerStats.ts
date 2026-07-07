@@ -38,6 +38,15 @@ export interface CrossSystemRank {
 
 const MAX_REASONABLE_PREDICTED_GOALS = 50;
 
+const countryAliases: Record<string, string> = {
+  Equador: 'Ecuador',
+};
+
+function canonicalTeamName(team: string): string {
+  const normalized = team.trim();
+  return countryAliases[normalized] ?? normalized;
+}
+
 function isReasonablePredictedScore(score: number): boolean {
   return Number.isFinite(score) && score >= 0 && score <= MAX_REASONABLE_PREDICTED_GOALS;
 }
@@ -85,6 +94,8 @@ export function getPlayerAccuracy(player: PlayerScore, games: Game[]): PlayerAcc
   let totalAwayError = 0;
   let errorSampleCount = 0;
 
+  // Per-nation absolute scoring error: home nation tracks home-goal error,
+  // away nation tracks away-goal error.
   const teamErrorBuckets = new Map<string, number[]>();
 
   for (const gb of player.gameBreakdowns) {
@@ -114,33 +125,33 @@ export function getPlayerAccuracy(player: PlayerScore, games: Game[]): PlayerAcc
     totalAwayError += awayError;
     errorSampleCount += 1;
 
-    const homeBucket = teamErrorBuckets.get(game.home) ?? [];
-    homeBucket.push(gameError);
-    teamErrorBuckets.set(game.home, homeBucket);
+    const homeTeam = canonicalTeamName(game.home);
+    const awayTeam = canonicalTeamName(game.away);
 
-    const awayBucket = teamErrorBuckets.get(game.away) ?? [];
-    awayBucket.push(gameError);
-    teamErrorBuckets.set(game.away, awayBucket);
+    const homeBucket = teamErrorBuckets.get(homeTeam) ?? [];
+    homeBucket.push(homeError);
+    teamErrorBuckets.set(homeTeam, homeBucket);
+
+    const awayBucket = teamErrorBuckets.get(awayTeam) ?? [];
+    awayBucket.push(awayError);
+    teamErrorBuckets.set(awayTeam, awayBucket);
   }
 
-  let bestTeam: string | null = null;
-  let worstTeam: string | null = null;
-  let bestTeamError: number | null = null;
-  let worstTeamError: number | null = null;
+  const teamAverages = Array.from(teamErrorBuckets.entries())
+    .filter(([, errors]) => errors.length > 0)
+    .map(([team, errors]) => ({
+      team,
+      avg: errors.reduce((sum, val) => sum + val, 0) / errors.length,
+    }))
+    .sort((a, b) => a.avg - b.avg || a.team.localeCompare(b.team));
 
-  for (const [team, errors] of teamErrorBuckets) {
-    if (errors.length === 0) continue;
-    const avg = errors.reduce((sum, val) => sum + val, 0) / errors.length;
+  const best = teamAverages[0] ?? null;
+  const worst = teamAverages.length > 1 ? teamAverages[teamAverages.length - 1] : null;
 
-    if (bestTeamError === null || avg < bestTeamError) {
-      bestTeam = team;
-      bestTeamError = avg;
-    }
-    if (worstTeamError === null || avg > worstTeamError) {
-      worstTeam = team;
-      worstTeamError = avg;
-    }
-  }
+  const bestTeam: string | null = best?.team ?? null;
+  const bestTeamError: number | null = best?.avg ?? null;
+  const worstTeam: string | null = worst?.team ?? null;
+  const worstTeamError: number | null = worst?.avg ?? null;
 
   const round = (n: number) => Math.round(n * 100) / 100;
 

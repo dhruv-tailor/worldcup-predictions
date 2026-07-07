@@ -40,6 +40,14 @@ Raf;1;1;0
 Didi;1;3;0
 ```
 
+**final_winner_predictions.csv** — one pre-tournament champion pick per player:
+
+```
+name;nation
+Ted;Argentina
+Luca;France
+```
+
 ## Scoring Systems
 
 | System | Type | Description |
@@ -54,6 +62,17 @@ Didi;1;3;0
 | **Hot Streak** | Stateful | Ted Classic base + escalating bonus for consecutive correct winners |
 | **Equal Aggregate** | Meta | Min-max normalized average across all 8 base systems |
 | **Weighted Aggregate** | Meta | Weighted normalized average (Gam ×2, BS ×1.5, Lad ×1.5, HS ×1.5, TC/T+/T28/PT ×1) |
+
+## Final Winner Side-Pot Bonus
+
+At the end of the tournament, each selected leaderboard gets a side-pot bonus based on champion picks.
+
+- Champion is resolved from the last scheduled game (highest game ID) winner.
+- Pool size per leaderboard = `15%` of that leaderboard's pre-bonus spread (`max total - min total`).
+- Players who picked the champion in `final_winner_predictions.csv` split the pool equally.
+- If no one picked correctly, no final-winner bonus is awarded.
+
+This keeps final picks meaningful without making earlier games irrelevant.
 
 ## Adding a Scoring System
 

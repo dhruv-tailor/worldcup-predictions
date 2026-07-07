@@ -36,6 +36,7 @@ export default function PlayerPage() {
 
       <PlayerProfile
         player={player}
+        standings={standings}
         games={games}
         predictions={predictions}
         selectedSystem={selectedSystem}

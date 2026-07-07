@@ -9,10 +9,11 @@
  */
 
 import Papa from 'papaparse';
-import type { Game, Prediction } from '../types';
+import type { FinalWinnerPrediction, Game, Prediction } from '../types';
 
 import gamesRaw from '../data/games.csv?raw';
 import predictionsRaw from '../data/predictions.csv?raw';
+import finalWinnerPredictionsRaw from '../data/final_winner_predictions.csv?raw';
 
 function parseHomeWin(value: string | undefined): 'W' | 'L' | null {
   const normalized = (value ?? '').trim();
@@ -90,4 +91,27 @@ export function parsePredictions(): Prediction[] {
         Number.isFinite(prediction.homeScore) &&
         Number.isFinite(prediction.awayScore),
     );
+}
+
+/**
+ * Parses final winner picks into typed {@link FinalWinnerPrediction} objects.
+ *
+ * CSV format: `name;nation`
+ * - Each row is one player's champion pick made before the tournament starts
+ *
+ * @returns Array of all champion picks
+ */
+export function parseFinalWinnerPredictions(): FinalWinnerPrediction[] {
+  const result = Papa.parse(finalWinnerPredictionsRaw, {
+    delimiter: ';',
+    header: true,
+    skipEmptyLines: true,
+  });
+
+  return (result.data as Record<string, string>[])
+    .map((row) => ({
+      name: (row.name ?? '').trim(),
+      nation: (row.nation ?? '').trim(),
+    }))
+    .filter((prediction) => prediction.name !== '' && prediction.nation !== '');
 }

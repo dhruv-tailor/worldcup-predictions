@@ -40,6 +40,16 @@ export interface Prediction {
 }
 
 /**
+ * A player's pre-tournament pick for tournament champion.
+ */
+export interface FinalWinnerPrediction {
+  /** Player name */
+  name: string;
+  /** Predicted champion nation */
+  nation: string;
+}
+
+/**
  * Points earned for a single game under a specific scoring system.
  * Uses a flexible `categories` map so each scoring system can define
  * its own breakdown keys (e.g. "winner", "goalDifference", "streakBonus").
@@ -71,6 +81,14 @@ export interface PlayerScore {
   name: string;
   /** Cumulative points (or final ELO rating for Ladder mode) */
   totalPoints: number;
+  /** Total points before final winner side-pot bonus is applied */
+  basePoints?: number;
+  /** Pre-tournament champion pick from final_winner_predictions.csv */
+  finalWinnerPick?: string | null;
+  /** Whether the player's champion pick matched the actual champion */
+  pickedChampion?: boolean;
+  /** Side-pot bonus awarded for picking the champion */
+  finalWinnerBonus?: number;
   /** Per-game point breakdowns, ordered by game ID */
   gameBreakdowns: GameBreakdown[];
   /** Current consecutive correct-winner streak (Hot Streak only) */

@@ -125,6 +125,9 @@ export default function Leaderboard({ standings, games, system }: LeaderboardPro
             >
               Total{sortIndicator('total')}
             </th>
+            <th className="stat-col" title="Final winner side-pot bonus">
+              Final Bonus
+            </th>
             {lastGameId != null && (
               <th
                 className="delta-col sortable"
@@ -187,7 +190,8 @@ export default function Leaderboard({ standings, games, system }: LeaderboardPro
                     {player.name}
                   </Link>
                 </td>
-                <td className="total-col">{player.totalPoints}</td>
+                <td className="total-col">{formatPoints(player.totalPoints)}</td>
+                <td className="stat-col">{formatSignedBonus(player.finalWinnerBonus)}</td>
                 {lastGameId != null && (() => {
                   const lastBreakdown = player.gameBreakdowns.find((gb) => gb.gameId === lastGameId);
                   const delta = lastBreakdown?.points.total ?? 0;
@@ -269,6 +273,16 @@ function pointsClass(points: number, max?: number): string {
   if (points >= m * 0.5) return 'pts-good';
   if (points >= 1) return 'pts-ok';
   return 'pts-zero';
+}
+
+function formatPoints(points: number): string {
+  return Number.isInteger(points) ? `${points}` : points.toFixed(2);
+}
+
+function formatSignedBonus(bonus?: number): string {
+  if (bonus == null) return '-';
+  if (bonus === 0) return '0';
+  return bonus > 0 ? `+${formatPoints(bonus)}` : formatPoints(bonus);
 }
 
 function streakFlames(streak: number): string {
