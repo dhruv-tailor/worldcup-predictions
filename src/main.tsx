@@ -1,4 +1,3 @@
-/* @refresh skip */
 import { StrictMode, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
@@ -13,6 +12,7 @@ const PlayerPage = lazy(() => import('./pages/PlayerPage'))
 const PlayersPage = lazy(() => import('./pages/PlayersPage'))
 const ControlPage = lazy(() => import('./pages/ControlPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const TimelinesPage = lazy(() => import('./pages/TimelinesPage'))
 
 const router = createBrowserRouter(
   [
@@ -24,6 +24,7 @@ const router = createBrowserRouter(
         { path: 'breakdown', element: <BreakdownPage /> },
         { path: 'control', element: <ControlPage /> },
         { path: 'upcoming', element: <UpcomingPage /> },
+        { path: 'timelines', element: <TimelinesPage /> },
         { path: 'players', element: <PlayersPage /> },
         { path: 'player/:name', element: <PlayerPage /> },
         { path: 'admin', element: <AdminPage /> },

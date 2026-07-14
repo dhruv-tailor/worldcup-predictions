@@ -26,8 +26,8 @@ const fiveDollarBets: ScoringSystem = {
   maxPerGame: undefined, // dynamic — depends on number of players
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
     const playerMap = new Map<string, GameBreakdown[]>();
-    let winCountMap = new Map<string, number>();
-    let gamesPlayedMap = new Map<string, number>();
+    const winCountMap = new Map<string, number>();
+    const gamesPlayedMap = new Map<string, number>();
 
     for (const prediction of predictions) {
       if (!playerMap.has(prediction.name)) {

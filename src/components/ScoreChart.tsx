@@ -5,8 +5,8 @@
  * and the Y-axis being the cumulative point total up to that game.
  * For the Ladder (ELO) system, the Y-axis shows the ELO rating instead.
  *
- * Only played games are plotted. Players are colored with a fixed palette
- * so colors remain consistent when switching scoring systems.
+ * Only played games are plotted. Players are colored deterministically from
+ * their names so colors remain stable across systems and sessions.
  */
 
 import { useMemo, useState } from 'react';
@@ -25,6 +25,7 @@ import {
 import type { TooltipProps } from 'recharts';
 import type { PlayerScore, Game, ScoringSystem } from '../types';
 import { getGameLabelShort } from '../utils/flags';
+import { getPlayerColor } from '../utils/playerColors';
 
 interface ScoreChartProps {
   /** Sorted player standings from the active scoring system */
@@ -36,13 +37,6 @@ interface ScoreChartProps {
 }
 
 type ChartType = 'line' | 'bar';
-
-/** Fixed color palette for up to 12 players */
-const COLORS = [
-  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe',
-  '#00c49f', '#ffbb28', '#ff8042', '#a4de6c', '#d0ed57',
-  '#8dd1e1', '#e6194b',
-];
 
 export default function ScoreChart({ standings, games, system }: ScoreChartProps) {
   const isElo = system.name === 'Ladder';
@@ -87,7 +81,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
     }
 
     return { chartData: data, playerNames: names };
-  }, [standings, games, system, isElo]);
+  }, [standings, games, isElo]);
 
   if (chartData.length === 0) {
     return <div className="score-chart empty">No games played yet</div>;
@@ -142,7 +136,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
         <BarChart {...commonProps}>
           {grid}{xAxis}{yAxis}{tooltip}{legend}
           {visiblePlayers.map((name) => (
-            <Bar key={name} dataKey={name} fill={COLORS[playerNames.indexOf(name) % COLORS.length]} opacity={0.85} />
+            <Bar key={name} dataKey={name} fill={getPlayerColor(name)} opacity={0.85} />
           ))}
         </BarChart>
       );
@@ -156,7 +150,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
             key={name}
             type="monotone"
             dataKey={name}
-            stroke={COLORS[playerNames.indexOf(name) % COLORS.length]}
+            stroke={getPlayerColor(name)}
             strokeWidth={2}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
@@ -171,7 +165,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
       <div className="score-chart-header">
         <h3>{isElo ? 'ELO Rating Over Time' : 'Cumulative Score Over Time'}</h3>
         <div className="chart-controls">
-          {(['line', 'area', 'bar'] as ChartType[]).map((t) => (
+          {(['line', 'bar'] as ChartType[]).map((t) => (
             <button
               key={t}
               className={`chart-type-btn ${chartType === t ? 'active' : ''}`}
@@ -187,7 +181,7 @@ export default function ScoreChart({ standings, games, system }: ScoreChartProps
           <button
             key={name}
             className={`player-toggle-btn ${hiddenPlayers.has(name) ? 'hidden-player' : ''}`}
-            style={{ borderColor: COLORS[playerNames.indexOf(name) % COLORS.length], color: COLORS[playerNames.indexOf(name) % COLORS.length] }}
+            style={{ borderColor: getPlayerColor(name), color: getPlayerColor(name) }}
             onClick={() => togglePlayer(name)}
           >
             {name}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -12,6 +12,7 @@ import {
 import type { TooltipProps } from 'recharts';
 import type { Game, PlayerScore, Prediction } from '../types';
 import { getGameLabelShort } from '../utils/flags';
+import { getPlayerColor } from '../utils/playerColors';
 import { scoringSystems } from '../utils/scoring';
 
 interface LeaderboardControlChartProps {
@@ -42,12 +43,6 @@ function toRoman(n: number): string {
   }
   return result;
 }
-
-const COLORS = [
-  '#c23b22', '#2e8b57', '#8a6b00', '#6b4226', '#1a3a5c',
-  '#8fbc8f', '#cc5500', '#8b4513', '#7b2d8b', '#191970',
-  '#8c5b2a', '#2f4f4f',
-];
 
 /**
  * Returns player names occupying the given rank (1-based) using standard ranking
@@ -224,16 +219,9 @@ interface ControlSectionProps {
 }
 
 function ControlSection({ title, subtitle, chartData, eras, playerNames, dynastyPlayers, systemCount }: ControlSectionProps) {
-  const [hiddenPlayers, setHiddenPlayers] = useState<Set<string>>(new Set());
-  const initializedDefaultVisibility = useRef(false);
-
-  useEffect(() => {
-    if (initializedDefaultVisibility.current) return;
-    if (playerNames.length === 0) return;
-    const defaultHidden = new Set(playerNames.filter((name) => !dynastyPlayers.has(name)));
-    setHiddenPlayers(defaultHidden);
-    initializedDefaultVisibility.current = true;
-  }, [playerNames, dynastyPlayers]);
+  const [hiddenPlayers, setHiddenPlayers] = useState<Set<string>>(
+    () => new Set(playerNames.filter((name) => !dynastyPlayers.has(name))),
+  );
 
   const togglePlayer = (name: string) => {
     setHiddenPlayers((previous) => {
@@ -289,7 +277,7 @@ function ControlSection({ title, subtitle, chartData, eras, playerNames, dynasty
             key={name}
             className={`player-toggle-btn ${hiddenPlayers.has(name) ? 'hidden-player' : ''}`}
             style={{
-              borderColor: COLORS[playerNames.indexOf(name) % COLORS.length],
+              borderColor: getPlayerColor(name),
             }}
             onClick={() => togglePlayer(name)}
           >
@@ -311,7 +299,7 @@ function ControlSection({ title, subtitle, chartData, eras, playerNames, dynasty
               key={name}
               type="monotone"
               dataKey={name}
-              stroke={COLORS[playerNames.indexOf(name) % COLORS.length]}
+              stroke={getPlayerColor(name)}
               strokeWidth={2}
               dot={{ r: 3 }}
               activeDot={{ r: 5 }}

@@ -36,7 +36,7 @@ describe('resolveChampionNation', () => {
 });
 
 describe('applyFinalWinnerBonus', () => {
-  it('splits 15% spread pool equally among correct predictors', () => {
+  it('splits 20% spread pool equally among correct predictors', () => {
     const standings = [
       makeScore('Alice', 100),
       makeScore('Bob', 90),
@@ -53,13 +53,13 @@ describe('applyFinalWinnerBonus', () => {
     const bob = boosted.find((p) => p.name === 'Bob');
     const cara = boosted.find((p) => p.name === 'Cara');
 
-    // spread = 20, pool = 3.00, each correct = 1.50
-    expect(alice?.finalWinnerBonus).toBe(1.5);
-    expect(bob?.finalWinnerBonus).toBe(1.5);
+    // spread = 20, pool = 4.00, each correct = 2.00
+    expect(alice?.finalWinnerBonus).toBe(2);
+    expect(bob?.finalWinnerBonus).toBe(2);
     expect(cara?.finalWinnerBonus).toBe(0);
 
-    expect(alice?.totalPoints).toBe(101.5);
-    expect(bob?.totalPoints).toBe(91.5);
+    expect(alice?.totalPoints).toBe(102);
+    expect(bob?.totalPoints).toBe(92);
     expect(cara?.totalPoints).toBe(80);
   });
 

@@ -83,11 +83,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hasSeedChanged) {
-      setGames(csvGames);
-      setPredictions(csvPredictions);
       saveSeedSignature(csvSeedSignature);
     }
-  }, [hasSeedChanged, csvGames, csvPredictions, csvSeedSignature]);
+  }, [hasSeedChanged, csvSeedSignature]);
 
   // Admin mode is enabled by default; persisted value is respected once set.
   const [isAdmin, setIsAdminInternal] = useState(() => {

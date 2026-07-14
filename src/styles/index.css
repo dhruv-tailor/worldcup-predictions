@@ -6,6 +6,7 @@
 @import './components/leaderboard-control.css';
 @import './components/category-breakdown.css';
 @import './components/upcoming-games.css';
+@import './components/timelines.css';
 @import './pages/player-profile.css';
 @import './pages/players-gallery.css';
 @import './components/player-card.css';

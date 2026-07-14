@@ -32,8 +32,8 @@ const blackSheep: ScoringSystem = {
   calculateStandings(games: Game[], predictions: Prediction[]): PlayerScore[] {
     const playerMap = new Map<string, GameBreakdown[]>();
     const playerEdges = new Map<string, number[]>();
-    let beatCount = new Map<string, number>();
-    let playedWithPrediction = new Map<string, number>();
+    const beatCount = new Map<string, number>();
+    const playedWithPrediction = new Map<string, number>();
 
     for (const prediction of predictions) {
       if (!playerMap.has(prediction.name)) {

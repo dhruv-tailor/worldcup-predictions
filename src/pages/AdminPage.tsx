@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppContext } from '../context/useAppContext';
 import { downloadCsv, exportGamesCsv, exportPredictionsCsv } from '../utils/exportCsv';
 import '../styles/pages/admin.css';
@@ -31,7 +31,7 @@ export default function AdminPage() {
   const [newPredAway, setNewPredAway] = useState('');
   const [batchPlayer, setBatchPlayer] = useState('');
   const [batchCount, setBatchCount] = useState('4');
-  const [batchDrafts, setBatchDrafts] = useState<BatchPredictionDrafts>({});
+  const [batchDraftOverrides, setBatchDraftOverrides] = useState<BatchPredictionDrafts>({});
 
   const upcomingGames = useMemo(
     () => games.filter((g) => g.homeScore === null).sort((a, b) => a.id - b.id),
@@ -51,37 +51,21 @@ export default function AdminPage() {
     [upcomingGames, requestedBatchCount],
   );
 
-  useEffect(() => {
-    setResultDrafts((prev) => {
-      const next: ResultDrafts = { ...prev };
-      for (const game of upcomingGames) {
-        if (!next[game.id]) {
-          next[game.id] = {
-            home: game.homeScore !== null ? String(game.homeScore) : '',
-            away: game.awayScore !== null ? String(game.awayScore) : '',
-          };
-        }
-      }
-      return next;
-    });
-  }, [upcomingGames]);
-
-  useEffect(() => {
-    if (!batchPlayer || upcomingBatchGames.length === 0) {
-      setBatchDrafts({});
-      return;
-    }
+  const batchDrafts = useMemo(() => {
+    if (!batchPlayer || upcomingBatchGames.length === 0) return {};
 
     const next: BatchPredictionDrafts = {};
     for (const game of upcomingBatchGames) {
       const existing = predictions.find((p) => p.name === batchPlayer && p.gameId === game.id);
+      const override = batchDraftOverrides[game.id];
       next[game.id] = {
-        home: existing ? String(existing.homeScore) : '',
-        away: existing ? String(existing.awayScore) : '',
+        home: override?.home ?? (existing ? String(existing.homeScore) : ''),
+        away: override?.away ?? (existing ? String(existing.awayScore) : ''),
       };
     }
-    setBatchDrafts(next);
-  }, [batchPlayer, upcomingBatchGames, predictions]);
+
+    return next;
+  }, [batchPlayer, upcomingBatchGames, predictions, batchDraftOverrides]);
 
   const handleAddGame = () => {
     if (!newGameHome.trim() || !newGameAway.trim()) return;
@@ -100,7 +84,11 @@ export default function AdminPage() {
   };
 
   const handleUpdateScore = (gameId: number) => {
-    const draft = resultDrafts[gameId] ?? { home: '', away: '' };
+    const game = games.find((currentGame) => currentGame.id === gameId);
+    const draft = resultDrafts[gameId] ?? {
+      home: game?.homeScore !== null && game?.homeScore !== undefined ? String(game.homeScore) : '',
+      away: game?.awayScore !== null && game?.awayScore !== undefined ? String(game.awayScore) : '',
+    };
     const hs = draft.home.trim() !== '' ? parseInt(draft.home, 10) : null;
     const as = draft.away.trim() !== '' ? parseInt(draft.away, 10) : null;
     updateGame(gameId, hs, as);
@@ -132,7 +120,7 @@ export default function AdminPage() {
   };
 
   const handleBatchDraftChange = (gameId: number, side: 'home' | 'away', value: string) => {
-    setBatchDrafts((prev) => ({
+    setBatchDraftOverrides((prev) => ({
       ...prev,
       [gameId]: {
         ...(prev[gameId] ?? { home: '', away: '' }),
@@ -260,7 +248,10 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {upcomingGames.map((game) => {
-                  const draft = resultDrafts[game.id] ?? { home: '', away: '' };
+                  const draft = resultDrafts[game.id] ?? {
+                    home: game.homeScore !== null ? String(game.homeScore) : '',
+                    away: game.awayScore !== null ? String(game.awayScore) : '',
+                  };
                   return (
                     <tr key={game.id}>
                       <td className="results-game-label">#{game.id}</td>
@@ -316,7 +307,7 @@ export default function AdminPage() {
             <div className="form-row">
               <label>
                 Player
-                <select value={batchPlayer} onChange={(e) => setBatchPlayer(e.target.value)}>
+                <select value={batchPlayer} onChange={(e) => { setBatchPlayer(e.target.value); setBatchDraftOverrides({}); }}>
                   <option value="">Select player</option>
                   {playerNames.map((name) => (
                     <option key={name} value={name}>
@@ -327,7 +318,7 @@ export default function AdminPage() {
               </label>
               <label>
                 Next X Games
-                <select value={batchCount} onChange={(e) => setBatchCount(e.target.value)}>
+                <select value={batchCount} onChange={(e) => { setBatchCount(e.target.value); setBatchDraftOverrides({}); }}>
                   {[2, 3, 4, 5, 6, 8, 10].map((n) => (
                     <option key={n} value={n}>
                       {n}

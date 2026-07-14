@@ -46,6 +46,9 @@ export default function Layout() {
           <NavLink to="/upcoming" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🔮 Upcoming
           </NavLink>
+          <NavLink to="/timelines" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            📊 Timelines
+          </NavLink>
           {firstPlayer && (
             <NavLink
               to="/players"
