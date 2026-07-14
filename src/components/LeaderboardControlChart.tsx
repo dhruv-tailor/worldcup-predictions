@@ -10,79 +10,16 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { TooltipProps } from 'recharts';
-import type { Game, PlayerScore, Prediction } from '../types';
+import type { Game, Prediction } from '../types';
 import { getGameLabelShort } from '../utils/flags';
 import { getPlayerColor } from '../utils/playerColors';
 import { scoringSystems } from '../utils/scoring';
+import type { ControlRankSnapshot, EraLabels, EraSegment } from '../utils/controlEras';
+import { computeEras, getPlayersAtRank } from '../utils/controlEras';
 
 interface LeaderboardControlChartProps {
   games: Game[];
   predictions: Prediction[];
-}
-
-interface EraSegment {
-  label: string;
-  startGameId: number;
-  endGameId: number;
-  type: 'stable' | 'chaotic';
-  playerName?: string;
-  isGoldenAge?: boolean;
-  /** 1-based index of this player's stable eras (used for Roman numeral suffix) */
-  dynastyIndex?: number;
-}
-
-function toRoman(n: number): string {
-  const numerals: [number, string][] = [
-    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
-    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
-    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
-  ];
-  let result = '';
-  for (const [value, numeral] of numerals) {
-    while (n >= value) { result += numeral; n -= value; }
-  }
-  return result;
-}
-
-/**
- * Returns player names occupying the given rank (1-based) using standard ranking
- * (ties cause subsequent ranks to be skipped). Returns an empty array if the rank
- * is skipped due to ties above it.
- *
- * Examples with standings [A=10, B=10, C=8, D=7]:
- *   rank 1 → [A, B]   (tied 1st)
- *   rank 2 → []        (skipped — 2 players tied 1st, so rank 2 doesn't exist)
- *   rank 3 → [C]       (first distinct tier after the 2-way tie)
- *   rank 4 → [D]
- */
-function getPlayersAtRank(standings: PlayerScore[], rank: number): string[] {
-  if (standings.length === 0) return [];
-
-  // Build distinct score tiers in descending order
-  const tiers: { points: number; players: string[] }[] = [];
-  for (const player of standings) {
-    const last = tiers[tiers.length - 1];
-    if (last && last.points === player.totalPoints) {
-      last.players.push(player.name);
-    } else {
-      tiers.push({ points: player.totalPoints, players: [player.name] });
-    }
-  }
-
-  // Walk tiers and apply standard ranking
-  let currentRank = 1;
-  for (const tier of tiers) {
-    if (currentRank === rank) return tier.players;
-    if (currentRank > rank) return []; // rank was skipped
-    currentRank += tier.players.length; // skip ahead by tie count
-  }
-  return [];
-}
-
-interface EraLabels {
-  stable: (player: string) => string;
-  chaotic: string;
-  goldenAge: (player: string) => string;
 }
 
 const ERA_LABELS_1ST: EraLabels = {
@@ -102,107 +39,6 @@ const ERA_LABELS_3RD: EraLabels = {
   chaotic: 'Border Skirmish 邊亂',
   goldenAge: (p) => `${p} Bronze Ascent 銅升`,
 };
-
-/**
- * Classifies an array of per-game chart entries into era segments
- * (Dynasty / Chaotic / Golden Age) based on how many systems each player
- * controls above the majority threshold.
- */
-function computeEras(
-  data: Record<string, string | number>[],
-  names: string[],
-  systemCount: number,
-  labels: EraLabels,
-): EraSegment[] {
-  const computedEras: EraSegment[] = [];
-  const stableThreshold = Math.floor(systemCount / 2) + 1;
-  // Track how many distinct stable eras each player has started (for dynastyIndex)
-  const playerDynastyIndex = new Map<string, number>();
-
-  for (const entry of data) {
-    const gameId = Number(entry.gameId);
-
-    const controllersAboveThreshold: string[] = [];
-    for (const name of names) {
-      const count = Number(entry[name] ?? 0);
-      if (count >= stableThreshold) {
-        controllersAboveThreshold.push(name);
-      }
-    }
-
-    const isStable = controllersAboveThreshold.length === 1;
-    const stablePlayer = isStable ? controllersAboveThreshold[0] : undefined;
-
-    const previous = computedEras[computedEras.length - 1];
-
-    const sameEra =
-      !!previous &&
-      previous.type === (isStable ? 'stable' : 'chaotic') &&
-      ((isStable && previous.playerName === stablePlayer) || (!isStable && !previous.playerName));
-
-    if (sameEra) {
-      previous.endGameId = gameId;
-    } else {
-      let dynastyIndex: number | undefined;
-      if (isStable && stablePlayer) {
-        const idx = (playerDynastyIndex.get(stablePlayer) ?? 0) + 1;
-        playerDynastyIndex.set(stablePlayer, idx);
-        dynastyIndex = idx;
-      }
-      computedEras.push({
-        label: isStable ? labels.stable(stablePlayer!) : labels.chaotic,
-        startGameId: gameId,
-        endGameId: gameId,
-        type: isStable ? 'stable' : 'chaotic',
-        playerName: stablePlayer,
-        isGoldenAge: false,
-        dynastyIndex,
-      });
-    }
-  }
-
-  // Count total stable eras per player to decide whether to apply Roman numeral suffixes
-  const totalDynasties = new Map<string, number>();
-  for (const era of computedEras) {
-    if (era.type === 'stable' && era.playerName) {
-      totalDynasties.set(era.playerName, (totalDynasties.get(era.playerName) ?? 0) + 1);
-    }
-  }
-
-  // Helper: build the display name with optional Roman numeral suffix
-  const displayName = (playerName: string, dynastyIndex: number | undefined): string => {
-    const total = totalDynasties.get(playerName) ?? 1;
-    if (total > 1 && dynastyIndex !== undefined) {
-      return `${playerName} ${toRoman(dynastyIndex)}`;
-    }
-    return playerName;
-  };
-
-  // Update stable era labels now that we know total dynasty counts
-  for (const era of computedEras) {
-    if (era.type !== 'stable' || !era.playerName) continue;
-    era.label = labels.stable(displayName(era.playerName, era.dynastyIndex));
-  }
-
-  // Promote to Golden Age if dynasty player achieved full control at any point
-  for (const era of computedEras) {
-    if (era.type !== 'stable' || !era.playerName) continue;
-    const playerName = era.playerName;
-
-    const hadFullControl = data.some((entry) => {
-      const gameId = Number(entry.gameId);
-      if (gameId < era.startGameId || gameId > era.endGameId) return false;
-      return Number(entry[playerName] ?? 0) === systemCount;
-    });
-
-    if (hadFullControl) {
-      era.label = labels.goldenAge(displayName(playerName, era.dynastyIndex));
-      era.isGoldenAge = true;
-    }
-  }
-
-  return computedEras;
-}
 
 // ---------------------------------------------------------------------------
 // ControlSection — renders a single placement tier (1st, 2nd, or 3rd)
@@ -328,6 +164,7 @@ export default function LeaderboardControlChart({ games, predictions }: Leaderbo
     const data1st: Record<string, string | number>[] = [];
     const data2nd: Record<string, string | number>[] = [];
     const data3rd: Record<string, string | number>[] = [];
+    const rankSnapshots: ControlRankSnapshot[] = [];
     const includedGameIds = new Set<number>();
 
     for (const game of playedGames) {
@@ -346,19 +183,32 @@ export default function LeaderboardControlChart({ games, predictions }: Leaderbo
       const count1st = new Map<string, number>(names.map((name) => [name, 0]));
       const count2nd = new Map<string, number>(names.map((name) => [name, 0]));
       const count3rd = new Map<string, number>(names.map((name) => [name, 0]));
+      const allTop1 = new Map<string, number>(names.map((name) => [name, 0]));
+      const allTop2 = new Map<string, number>(names.map((name) => [name, 0]));
+      const allTop3 = new Map<string, number>(names.map((name) => [name, 0]));
 
       for (const system of scoringSystems) {
         const standings = system.calculateStandings(gamesAtStep, predictions);
         if (standings.length === 0) continue;
 
-        for (const player of getPlayersAtRank(standings, 1)) {
+        const rank1Players = getPlayersAtRank(standings, 1);
+        const rank2Players = getPlayersAtRank(standings, 2);
+        const rank3Players = getPlayersAtRank(standings, 3);
+
+        for (const player of rank1Players) {
           count1st.set(player, (count1st.get(player) ?? 0) + 1);
+          allTop1.set(player, (allTop1.get(player) ?? 0) + 1);
+          allTop2.set(player, (allTop2.get(player) ?? 0) + 1);
+          allTop3.set(player, (allTop3.get(player) ?? 0) + 1);
         }
-        for (const player of getPlayersAtRank(standings, 2)) {
+        for (const player of rank2Players) {
           count2nd.set(player, (count2nd.get(player) ?? 0) + 1);
+          allTop2.set(player, (allTop2.get(player) ?? 0) + 1);
+          allTop3.set(player, (allTop3.get(player) ?? 0) + 1);
         }
-        for (const player of getPlayersAtRank(standings, 3)) {
+        for (const player of rank3Players) {
           count3rd.set(player, (count3rd.get(player) ?? 0) + 1);
+          allTop3.set(player, (allTop3.get(player) ?? 0) + 1);
         }
       }
 
@@ -381,6 +231,13 @@ export default function LeaderboardControlChart({ games, predictions }: Leaderbo
       data1st.push(entry1st);
       data2nd.push(entry2nd);
       data3rd.push(entry3rd);
+
+      rankSnapshots.push({
+        gameId: game.id,
+        top1: new Set(names.filter((name) => (allTop1.get(name) ?? 0) === scoringSystems.length)),
+        top2: new Set(names.filter((name) => (allTop2.get(name) ?? 0) === scoringSystems.length)),
+        top3: new Set(names.filter((name) => (allTop3.get(name) ?? 0) === scoringSystems.length)),
+      });
     }
 
     const systemCount = scoringSystems.length;
@@ -390,9 +247,9 @@ export default function LeaderboardControlChart({ games, predictions }: Leaderbo
       chartData2nd: data2nd,
       chartData3rd: data3rd,
       playerNames: names,
-      eras1st: computeEras(data1st, names, systemCount, ERA_LABELS_1ST),
-      eras2nd: computeEras(data2nd, names, systemCount, ERA_LABELS_2ND),
-      eras3rd: computeEras(data3rd, names, systemCount, ERA_LABELS_3RD),
+      eras1st: computeEras(data1st, names, systemCount, ERA_LABELS_1ST, rankSnapshots, 'top1'),
+      eras2nd: computeEras(data2nd, names, systemCount, ERA_LABELS_2ND, rankSnapshots, 'top2'),
+      eras3rd: computeEras(data3rd, names, systemCount, ERA_LABELS_3RD, rankSnapshots, 'top3'),
     };
   }, [games, predictions]);
 
